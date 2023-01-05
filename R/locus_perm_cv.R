@@ -63,11 +63,6 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
   #make an object for the results
   results<-base::list()
 
-  #print
-  print(include_hets)
-  print(include_models)
-  print(verbose)
-
   #announce
   base::print(base::paste("Conducting permutational cross validation for", gene_name))
   base::print("0% complete!")

@@ -3,6 +3,7 @@
 #' This function takes a list of list object from the "locus_perm_cv" function and creates a summary graphic of the accuracy, kappa, sensitivity, and specificity of the models ran. If heterozygous individuals were left in the cross validation scheme, by-class sensitivity and specificity will be displayed; otherwise, displayed parameters will be of the overall model.
 #'
 #' @param results An object of class "list" which is derived from the "locus_perm_cv" function.
+#' @param individual_images A logical argument that defines if the user wants both the composite image and the full image. Default setting is FALSE.
 #'
 #' @return
 #' Prints a ggplot2 image
@@ -29,14 +30,18 @@
 #'                   ncor_markers=50, #number of markers to retain
 #'                   percent_testing=0.2, #percentage of genotypes in the validation set
 #'                   percent_training=0.8, #percentage of genotypes in the training set
-#'                   include_hets=T, #includes hets in the model
-#'                   include_models=T, #includes models in results object
-#'                   verbose = T) #includes text/plots
+#'                   include_hets=TRUE, #includes hets in the model
+#'                   include_models=TRUE, #includes models in results object
+#'                   verbose = TRUE) #includes text/plots
 #'
 #'#plot results
-#'plot_locus_perm_cv(fit)
+#'plot_locus_perm_cv(fit,
+#'                   individual_images=TRUE)
 #'
-plot_locus_perm_cv<-function(results){
+#'@importFrom patchwork plot_layout
+
+plot_locus_perm_cv<-function(results,
+                             individual_images=FALSE){
 
   if(base::is.list(results)==FALSE|
      base::length(base::names(results))<5|
@@ -46,7 +51,7 @@ plot_locus_perm_cv<-function(results){
 
   }
 
-  #this is in an attempt to appease the buidling test issues
+  #this line is so that the devtools::check passes
   Accuracy<-Kappa<-Sensitivity<-Specificity<-Model<-Class<-NULL
 
   if(base::is.null(results$By_Class_Parameters$Class)){
@@ -80,9 +85,17 @@ plot_locus_perm_cv<-function(results){
                      axis.ticks.x = ggplot2::element_blank(),
                      legend.position = "none")+
       ggplot2::labs(title = "Overall Specificity")
-    f<-(b+c)/(d+e)+
+
+    if(individual_images==TRUE){
+      base::print(b)
+      base::print(c)
+      base::print(d)
+      base::print(e)
+    }
+
+    f<-((b+c)/(d+e))+
       patchwork::plot_layout(guides = "collect")
-    print(f)
+    base::print(f)
 
   }else{
     a<-results$Overall_Parameters
@@ -116,9 +129,17 @@ plot_locus_perm_cv<-function(results){
                      axis.ticks.x = ggplot2::element_blank(),
                      legend.position = "none")+
       ggplot2::labs(title = "By-Class Specificity")
-    f<-(b+c)/(d+e)+
+
+    if(individual_images==TRUE){
+      base::print(b)
+      base::print(c)
+      base::print(d)
+      base::print(e)
+    }
+
+    f<-((b+c)/(d+e))+
       patchwork::plot_layout(guides = "collect")
-    print(f)
+    base::print(f)
   }
 
    remove(a,b,c,d,e,f)

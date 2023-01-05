@@ -3,3 +3,4 @@
 export(locus_cv)
 export(locus_perm_cv)
 export(plot_locus_perm_cv)
+importFrom(patchwork,plot_layout)

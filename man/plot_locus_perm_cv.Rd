@@ -4,10 +4,12 @@
 \alias{plot_locus_perm_cv}
 \title{Visualize Permutation CV Results}
 \usage{
-plot_locus_perm_cv(results)
+plot_locus_perm_cv(results, individual_images = FALSE)
 }
 \arguments{
 \item{results}{An object of class "list" which is derived from the "locus_perm_cv" function.}
+
+\item{individual_images}{A logical argument that defines if the user wants both the composite image and the full image. Default setting is FALSE.}
 }
 \value{
 Prints a ggplot2 image
@@ -35,11 +37,12 @@ fit<-locus_perm_cv(n_perms = 3, #the number of permutations
                   ncor_markers=50, #number of markers to retain
                   percent_testing=0.2, #percentage of genotypes in the validation set
                   percent_training=0.8, #percentage of genotypes in the training set
-                  include_hets=T, #includes hets in the model
-                  include_models=T, #includes models in results object
-                  verbose = T) #includes text/plots
+                  include_hets=TRUE, #includes hets in the model
+                  include_models=TRUE, #includes models in results object
+                  verbose = TRUE) #includes text/plots
 
 #plot results
-plot_locus_perm_cv(fit)
+plot_locus_perm_cv(fit,
+                  individual_images=TRUE)
 
 }
