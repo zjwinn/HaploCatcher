@@ -14,9 +14,9 @@ locus_perm_cv(
   ncor_markers = 50,
   percent_testing = 0.2,
   percent_training = 0.8,
-  include_hets = F,
-  include_models = F,
-  verbose = F
+  include_hets = FALSE,
+  include_models = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -40,8 +40,9 @@ locus_perm_cv(
 
 \item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.
-#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.}
+\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.}
+
+\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.}
 }
 \value{
 This function returns a list of list with the following objects: "Overall_Parameters", "By_Class_Parameters", "Overall_Summary", "By_Class_Summary", and "Raw_Permutation_Info". The "Overall_Parameters" data frame contains all the relevant parameters for each permutation overall. The "By_Class_Parameters" data frame contains all the relevant parameters for each permutation by class.The "Overall_Summary" data frame contains all the relevant parameters overall summarized across permutations. The "By_Class_Summary" data frame contains all the relevant parameters by class summariezed across permutations. The "Raw_Permutation_Info" is a list of list which contains each permutations model info as described in the "locus_cv" function.
@@ -60,17 +61,18 @@ data("marker_info")
 data("genecomp")
 
 #run permutational analysis
-fit<-locus_perm_cv(n_perms = 3, #the number of permutations
-                  geno_mat=geno_mat, #the genotypic matrix
-                  gene_file=genecomp, #the gene compendium file
-                  gene_name="sst1_solid_stem", #the name of the gene
-                  marker_info=marker_info, #the marker information file
-                  chromosome="3B", #name of the chromosome
-                  ncor_markers=50, #number of markers to retain
-                  percent_testing=0.2, #percentage of genotypes in the validation set
-                  percent_training=0.8, #percentage of genotypes in the training set
-                  include_hets=T, #includes hets in the model
-                  include_models=T, #includes models in results object
-                  verbose = T) #includes text/plots
+fit<-locus_perm_cv(n_perms = 2, #the number of permutations
+                   geno_mat=geno_mat, #the genotypic matrix
+                   gene_file=genecomp, #the gene compendium file
+                   gene_name="sst1_solid_stem", #the name of the gene
+                   marker_info=marker_info, #the marker information file
+                   chromosome="3B", #name of the chromosome
+                   ncor_markers=50, #number of markers to retain
+                   percent_testing=0.2, #percentage of genotypes in the validation set
+                   percent_training=0.8, #percentage of genotypes in the training set
+                   include_hets=FALSE, #excludes hets in the model
+                   include_models=FALSE, #excludes models in results object
+                   verbose = FALSE) #excludes text
+
 
 }

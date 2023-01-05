@@ -11,7 +11,7 @@
 #' @param percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.
 #' @param include_models A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.
-#'#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback. Default setting is TRUE.
+#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback. Default setting is TRUE.
 #'
 #' @return This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the seperate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test dataframes made by the function.
 #'
@@ -36,9 +36,9 @@
 #'               ncor_markers=50, #number of markers to retain
 #'               percent_testing=0.2, #percentage of genotypes in the validation set
 #'               percent_training=0.8, #percentage of genotypes in the training set
-#'               include_hets=T, #include hets in the model
-#'               include_models=T, #include models in the final results
-#'               verbose = T) #allows for text and graph output
+#'               include_hets=TRUE, #include hets in the model
+#'               include_models=TRUE, #include models in the final results
+#'               verbose = TRUE) #allows for text and graph output
 #'
 #'#fun the function without hets
 #'fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
@@ -49,9 +49,9 @@
 #'               ncor_markers=50, #number of markers to retain
 #'               percent_testing=0.2, #percentage of genotypes in the validation set
 #'               percent_training=0.8, #percentage of genotypes in the training set
-#'               include_hets=F, #excludes hets in the model
-#'               include_models=F, #excludes models in the final results
-#'               verbose = F) #silences function
+#'               include_hets=FALSE, #excludes hets in the model
+#'               include_models=FALSE, #excludes models in the final results
+#'               verbose = FALSE) #silences function
 #'
 locus_cv<-function(geno_mat,
                    gene_file,
@@ -86,9 +86,9 @@ locus_cv<-function(geno_mat,
   }
 
   #check if
-  if(include_hets==F){
+  if(include_hets==FALSE){
 
-    if(verbose==T){base::message("Note: Removing heterozygous calls from the dataframe")}
+    if(verbose==TRUE){base::message("Note: Removing heterozygous calls from the dataframe")}
     classification<-classification[!classification$Call %in% classification$Call[grep("het_", classification$Call)], ]
 
   }else if(!is.logical(include_hets)){
@@ -97,7 +97,7 @@ locus_cv<-function(geno_mat,
 
   }else{
 
-    if(verbose==T){base::message("Note: User has requested heterozygous calls remain in the dataset")}
+    if(verbose==TRUE){base::message("Note: User has requested heterozygous calls remain in the dataset")}
 
   }
 
@@ -182,7 +182,7 @@ locus_cv<-function(geno_mat,
   corr[,1:base::ncol(corr)]<-base::lapply(corr[,1:base::ncol(corr)], base::as.numeric)
 
   #perform correlation
-  corr<-base::suppressWarnings(round(cor(corr), 10))
+  corr<-base::suppressWarnings(base::round(stats::cor(corr), 10))
   corr<-base::data.frame("|r|"=corr[-1,1],
                          check.names = F)
   corr$`|r|`<-base::abs(corr$`|r|`)
@@ -191,7 +191,7 @@ locus_cv<-function(geno_mat,
   corr$MBP_Position<-base::round(base::as.numeric(corr$BP_Position)/1000000, 2)
 
   #plot results
-  if(verbose==T){
+  if(verbose==TRUE){
 
     base::plot(x=corr$MBP_Position,
                y=corr$`|r|`,
@@ -206,7 +206,7 @@ locus_cv<-function(geno_mat,
   corr<-corr[1:ncor_markers,]
 
   #plot threshold line
-  if(verbose==T){
+  if(verbose==TRUE){
 
     graphics::abline(h=min(corr$`|r|`), col = "red", lty=2)
     graphics::legend("bottomleft",legend=base::paste("Top", ncor_markers, "correlated markers thresold"),  col = "red", lty = 2 )
@@ -241,7 +241,7 @@ locus_cv<-function(geno_mat,
   test[,3:base::ncol(test)]<-base::lapply(test[,3:base::ncol(test)], base::as.numeric)
 
   #show frequency in the testing population
-  if(verbose==T){
+  if(verbose==TRUE){
 
     a<-base::data.frame(base::table(training$Call)/ base::nrow(training))
     base::colnames(a)=c("Call", "Frequency")
@@ -269,7 +269,7 @@ locus_cv<-function(geno_mat,
                                   method = "repeatedcv")
 
   #send message
-  if(verbose==T){print("Note: Running Models...")}
+  if(verbose==TRUE){print("Note: Running Models...")}
 
   #make grid
   grid_tune<-base::expand.grid(k = base::seq(from = 1,
@@ -296,11 +296,11 @@ locus_cv<-function(geno_mat,
                       trControl = cont_train)
 
   #send message
-  if(verbose==T){base::print("Note: Done!")}
-  if(verbose==T){base::print("Note: Displaying cross validation tuning results...")}
+  if(verbose==TRUE){base::print("Note: Done!")}
+  if(verbose==TRUE){base::print("Note: Displaying cross validation tuning results...")}
 
   #summary of models
-  if(verbose==T){
+  if(verbose==TRUE){
 
     base::print(fit_1)
     base::print(fit_2)
@@ -308,7 +308,7 @@ locus_cv<-function(geno_mat,
   }
 
   #send message
-  if(verbose==T){base::print("Note: Producing predictions and calculating confusion matricies on the test population")}
+  if(verbose==TRUE){base::print("Note: Producing predictions and calculating confusion matricies on the test population")}
 
   #predict
   pred_1<-stats::predict(fit_1, test[,-1])
@@ -331,7 +331,7 @@ locus_cv<-function(geno_mat,
                                   pred_2$Predicted_Call)
 
   #show tables
-  if(verbose==T){
+  if(verbose==TRUE){
 
     base::print(knitr::kable(confu_1$table, caption = "Confusion matrix of K-Nearest Neighbors predictions"))
     base::print(knitr::kable(confu_2$table, caption = "Confusion matrix of Random Forest predictions"))
@@ -352,14 +352,14 @@ locus_cv<-function(geno_mat,
                  "Accuracy_P_Value",
                  "Mcnemar_P_Value")
 
-  if(verbose==T){
+  if(verbose==TRUE){
 
     base::print(knitr::kable(a, caption = "Overall Accuracy Parameters", digits = 3))
 
   }
 
   #show results of models
-  if(include_hets==F){
+  if(include_hets==FALSE){
 
     a<-base::data.frame(Parameters=names(confu_1$byClass),
                         `K-Nearest Neighbors`=confu_1$byClass,
@@ -370,7 +370,7 @@ locus_cv<-function(geno_mat,
     a$Parameters[5]="Balanced_Accuracy"
     base::rownames(a)=NULL
 
-    if(verbose==T){
+    if(verbose==TRUE){
 
       base::print(knitr::kable(a, caption = "By-Class Accuracy Parameters", digits = 3))
 
@@ -378,7 +378,7 @@ locus_cv<-function(geno_mat,
 
   }
 
-  if(include_hets==T){
+  if(include_hets==TRUE){
 
     a<-base::as.data.frame(base::rbind(confu_1$byClass, confu_2$byClass))
     a$Model=c(base::rep("K-Nearest Neighbors", 3), base::rep("Random Forest",3))
@@ -395,7 +395,7 @@ locus_cv<-function(geno_mat,
     base::colnames(a)[7]="Balanced_Accuracy"
     rownames(a)=NULL
 
-    if(verbose==T){
+    if(verbose==TRUE){
 
       base::print(knitr::kable(a, caption = "By-Class Accuracy Parameters", digits = 3))
 
@@ -413,17 +413,17 @@ locus_cv<-function(geno_mat,
   data<-base::list(training=training,
                    test=test)
 
-  if(include_models==T){
+  if(include_models==TRUE){
 
-    if(verbose==T){base::message("Note: User has request that models remain in the results object")}
+    if(verbose==TRUE){base::message("Note: User has request that models remain in the results object")}
     results<-base::list(data_frames=data,
                         trained_models=models,
                         test_predictions=preds,
                         confusion_matrices=confu)
 
-  }else if(include_models==F){
+  }else if(include_models==FALSE){
 
-    if(verbose==T){base::message("Note: User has request that models are omitted from the results object")}
+    if(verbose==TRUE){base::message("Note: User has request that models are omitted from the results object")}
     results<-base::list(data_frames=data,
                         test_predictions=preds,
                         confusion_matrices=confu)

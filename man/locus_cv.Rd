@@ -37,8 +37,9 @@ locus_cv(
 
 \item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.
-#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback. Default setting is TRUE.}
+\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.}
+
+\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback. Default setting is TRUE.}
 }
 \value{
 This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the seperate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test dataframes made by the function.
@@ -65,9 +66,9 @@ fit1<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
               ncor_markers=50, #number of markers to retain
               percent_testing=0.2, #percentage of genotypes in the validation set
               percent_training=0.8, #percentage of genotypes in the training set
-              include_hets=T, #include hets in the model
-              include_models=T, #include models in the final results
-              verbose = T) #allows for text and graph output
+              include_hets=TRUE, #include hets in the model
+              include_models=TRUE, #include models in the final results
+              verbose = TRUE) #allows for text and graph output
 
 #fun the function without hets
 fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
@@ -78,8 +79,8 @@ fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
               ncor_markers=50, #number of markers to retain
               percent_testing=0.2, #percentage of genotypes in the validation set
               percent_training=0.8, #percentage of genotypes in the training set
-              include_hets=F, #excludes hets in the model
-              include_models=F, #excludes models in the final results
-              verbose = F) #silences function
+              include_hets=FALSE, #excludes hets in the model
+              include_models=FALSE, #excludes models in the final results
+              verbose = FALSE) #silences function
 
 }

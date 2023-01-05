@@ -46,16 +46,19 @@ plot_locus_perm_cv<-function(results){
 
   }
 
+  #this is in an attempt to appease the buidling test issues
+  Accuracy<-Kappa<-Sensitivity<-Specificity<-Model<-Class<-NULL
+
   if(base::is.null(results$By_Class_Parameters$Class)){
 
     a<-results$Overall_Parameters
-    b<-ggplot2::ggplot(data = a, aes(y=Accuracy, x=Model, fill=Model))+
+    b<-ggplot2::ggplot(data = a, ggplot2::aes(y=Accuracy, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                      axis.ticks.x = ggplot2::element_blank())+
       ggplot2::labs(title = "Overall Accuracy")
-    c<-ggplot2::ggplot(data = a, aes(y=Kappa, x=Model, fill=Model))+
+    c<-ggplot2::ggplot(data = a, ggplot2::aes(y=Kappa, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
@@ -63,14 +66,14 @@ plot_locus_perm_cv<-function(results){
                      legend.position = "none")+
       ggplot2::labs(title = "Overall Kappa")
     a<-results$By_Class_Parameters
-    d<-ggplot2::ggplot(data = a, aes(y=Sensitivity, x=Model, fill=Model))+
+    d<-ggplot2::ggplot(data = a, ggplot2::aes(y=Sensitivity, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                      axis.ticks.x = ggplot2::element_blank(),
                      legend.position = "none")+
       ggplot2::labs(title = "Overall Sensitivity")
-    e<-ggplot2::ggplot(data = a, aes(y=Specificity, x=Model, fill=Model))+
+    e<-ggplot2::ggplot(data = a, ggplot2::aes(y=Specificity, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
@@ -83,13 +86,13 @@ plot_locus_perm_cv<-function(results){
 
   }else{
     a<-results$Overall_Parameters
-    b<-ggplot2::ggplot(data = a, aes(y=Accuracy, x=Model, fill=Model))+
+    b<-ggplot2::ggplot(data = a, ggplot2::aes(y=Accuracy, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
                      axis.ticks.x = ggplot2::element_blank())+
       ggplot2::labs(title = "Overall Accuracy")
-    c<-ggplot2::ggplot(data = a, aes(y=Kappa, x=Model, fill=Model))+
+    c<-ggplot2::ggplot(data = a, ggplot2::aes(y=Kappa, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
@@ -97,7 +100,7 @@ plot_locus_perm_cv<-function(results){
                      legend.position = "none")+
       ggplot2::labs(title = "Overall Kappa")
     a<-results$By_Class_Parameters
-    d<-ggplot2::ggplot(data = a, aes(y=Sensitivity, x=Model, fill=Model))+
+    d<-ggplot2::ggplot(data = a, ggplot2::aes(y=Sensitivity, x=Model, fill=Model))+
       ggplot2::facet_grid(~base::paste("Class =", Class))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
@@ -105,7 +108,7 @@ plot_locus_perm_cv<-function(results){
                      axis.ticks.x = ggplot2::element_blank(),
                      legend.position = "none")+
       ggplot2::labs(title = "By-Class Sensitivity")
-    e<-ggplot2::ggplot(data = a, aes(y=Specificity, x=Model, fill=Model))+
+    e<-ggplot2::ggplot(data = a, ggplot2::aes(y=Specificity, x=Model, fill=Model))+
       ggplot2::facet_grid(~base::paste("Class =", Class))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+

@@ -13,7 +13,7 @@
 #' @param percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.
 #' @param include_models A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.
-#'#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.
+#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.
 #'
 #' @return
 #' This function returns a list of list with the following objects: "Overall_Parameters", "By_Class_Parameters", "Overall_Summary", "By_Class_Summary", and "Raw_Permutation_Info". The "Overall_Parameters" data frame contains all the relevant parameters for each permutation overall. The "By_Class_Parameters" data frame contains all the relevant parameters for each permutation by class.The "Overall_Summary" data frame contains all the relevant parameters overall summarized across permutations. The "By_Class_Summary" data frame contains all the relevant parameters by class summariezed across permutations. The "Raw_Permutation_Info" is a list of list which contains each permutations model info as described in the "locus_cv" function.
@@ -21,29 +21,31 @@
 #' @export
 #'
 #' @examples
-#'#read in the genotypic data matrix
-#'data("geno_mat")
+#' #read in the genotypic data matrix
+#' data("geno_mat")
 #'
-#'#read in the marker information
-#'data("marker_info")
+#' #read in the marker information
+#' data("marker_info")
 #'
-#'#read in the gene compendium file
-#'data("genecomp")
+#' #read in the gene compendium file
+#' data("genecomp")
 #'
-#'#run permutational analysis
-#'fit<-locus_perm_cv(n_perms = 3, #the number of permutations
-#'                   geno_mat=geno_mat, #the genotypic matrix
-#'                   gene_file=genecomp, #the gene compendium file
-#'                   gene_name="sst1_solid_stem", #the name of the gene
-#'                   marker_info=marker_info, #the marker information file
-#'                   chromosome="3B", #name of the chromosome
-#'                   ncor_markers=50, #number of markers to retain
-#'                   percent_testing=0.2, #percentage of genotypes in the validation set
-#'                   percent_training=0.8, #percentage of genotypes in the training set
-#'                   include_hets=T, #includes hets in the model
-#'                   include_models=T, #includes models in results object
-#'                   verbose = T) #includes text/plots
+#' #run permutational analysis
+#' fit<-locus_perm_cv(n_perms = 2, #the number of permutations
+#'                    geno_mat=geno_mat, #the genotypic matrix
+#'                    gene_file=genecomp, #the gene compendium file
+#'                    gene_name="sst1_solid_stem", #the name of the gene
+#'                    marker_info=marker_info, #the marker information file
+#'                    chromosome="3B", #name of the chromosome
+#'                    ncor_markers=50, #number of markers to retain
+#'                    percent_testing=0.2, #percentage of genotypes in the validation set
+#'                    percent_training=0.8, #percentage of genotypes in the training set
+#'                    include_hets=FALSE, #excludes hets in the model
+#'                    include_models=FALSE, #excludes models in results object
+#'                    verbose = FALSE) #excludes text
 #'
+#'
+
 locus_perm_cv<-function(n_perms=30, #number of permutations
                         geno_mat, #the genotypic matrix
                         gene_file, #the gene compendium file
@@ -53,9 +55,9 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
                         ncor_markers=50, #number of markers to retain
                         percent_testing=0.2, #percentage of genotypes in the validation set
                         percent_training=0.8, #percentage of genotypes in the training set
-                        include_hets=F, #include hets in the model
-                        include_models=F, #include models,
-                        verbose=F){ #include text/graph feedback
+                        include_hets=FALSE, #include hets in the model
+                        include_models=FALSE, #include models,
+                        verbose=FALSE){ #include text/graph feedback
 
   #make an object for the results
   results<-base::list()
@@ -67,17 +69,17 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
   for(i in 1:n_perms){
 
     #run function
-    a<-GrainBreed::locus_cv(geno_mat = geno_mat,
-                            gene_file = gene_file,
-                            gene_name = gene_name,
-                            marker_info = marker_info,
-                            chromosome = chromosome,
-                            ncor_markers = ncor_markers,
-                            percent_testing = percent_testing,
-                            percent_training = percent_training,
-                            include_hets = include_hets,
-                            include_models = include_models,
-                            verbose = verbose)
+    a<-HaploMapper::locus_cv(geno_mat = geno_mat,
+                             gene_file = gene_file,
+                             gene_name = gene_name,
+                             marker_info = marker_info,
+                             chromosome = chromosome,
+                             ncor_markers = ncor_markers,
+                             percent_testing = percent_testing,
+                             percent_training = percent_training,
+                             include_hets = include_hets,
+                             include_models = include_models,
+                             verbose = verbose)
 
     #put in a list object
     results[[base::paste("Permutation_", i, sep = "")]]<-a
@@ -96,7 +98,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
   return_results<-base::list()
 
   #summarize results
-  if(include_hets==T){
+  if(include_hets==TRUE){
 
     a<-base::c()
 
@@ -228,7 +230,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
     return_results[["By_Class_Summary"]]<-a
     remove(a,b,c,d)
 
-  }else if(include_hets==F){
+  }else if(include_hets==FALSE){
 
     a<-base::c()
 
