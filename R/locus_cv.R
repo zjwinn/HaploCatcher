@@ -184,7 +184,7 @@ locus_cv<-function(geno_mat,
   #perform correlation
   corr<-base::suppressWarnings(base::round(stats::cor(corr), 10))
   corr<-base::data.frame("|r|"=corr[-1,1],
-                         check.names = F)
+                         check.names = FALSE)
   corr$`|r|`<-base::abs(corr$`|r|`)
   corr$marker<-base::rownames(corr)
   corr$BP_Position<-selected_markers$BP_Position
@@ -202,7 +202,7 @@ locus_cv<-function(geno_mat,
   }
 
   #plot threshold
-  corr<-corr[base::order(corr$`|r|`, decreasing = T),]
+  corr<-corr[base::order(corr$`|r|`, decreasing = TRUE),]
   corr<-corr[1:ncor_markers,]
 
   #plot threshold line
@@ -342,7 +342,7 @@ locus_cv<-function(geno_mat,
   a<-base::data.frame(Parameters=names(confu_1$overall),
                       `K-Nearest Neighbors`=confu_1$overall,
                       `Random Forest`=confu_2$overall,
-                      check.names = F,
+                      check.names = FALSE,
                       row.names = NULL)
   a$Parameters=c("Accuracy",
                  "Kappa",
@@ -364,7 +364,7 @@ locus_cv<-function(geno_mat,
     a<-base::data.frame(Parameters=names(confu_1$byClass),
                         `K-Nearest Neighbors`=confu_1$byClass,
                         `Random Forest`=confu_2$byClass,
-                        check.names = F,
+                        check.names = FALSE,
                         row.names = NULL)
     a<-a[c(1,2,5,6,11),]
     a$Parameters[5]="Balanced_Accuracy"
