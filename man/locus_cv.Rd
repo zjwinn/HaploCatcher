@@ -13,9 +13,9 @@ locus_cv(
   ncor_markers = 50,
   percent_testing = 0.2,
   percent_training = 0.8,
-  include_hets = F,
-  include_models = F,
-  verbose = T
+  include_hets,
+  include_models,
+  verbose
 )
 }
 \arguments{
@@ -35,14 +35,14 @@ locus_cv(
 
 \item{percent_training}{A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.}
 
-\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
+\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.}
+\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object.}
 
-\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback. Default setting is TRUE.}
+\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback.}
 }
 \value{
-This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the seperate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test dataframes made by the function.
+This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.
 }
 \description{
 This function performs the analysis featured in Winn et al 2022 where genome wide markers are used to train machine learning models to identify if genotypes have or do not have specific alleles of a QTL/gene. This function is used to perform cross validation where a random partition of the total available data is used to train a model and a reserved testing partition is used to validate. This function is used for a single round of cross validation.

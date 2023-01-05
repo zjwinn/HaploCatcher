@@ -51,6 +51,7 @@ This function returns a list of list with the following objects: "Overall_Parame
 This function performs the analysis featured in Winn et al 2022 where genome wide markers are used to train machine learning models to identify if genotypes have or do not have specific alleles of a QTL/gene. This function is used to perform cross validation where a random partition of the total available data is used to train a model and a reserved testing partition is used to validate. This function is used for permutation based cross validation.
 }
 \examples{
+
 #read in the genotypic data matrix
 data("geno_mat")
 
@@ -72,7 +73,7 @@ fit<-locus_perm_cv(n_perms = 2, #the number of permutations
                    percent_training=0.8, #percentage of genotypes in the training set
                    include_hets=FALSE, #excludes hets in the model
                    include_models=FALSE, #excludes models in results object
-                   verbose = FALSE) #excludes text
+                   verbose=FALSE) #excludes text
 
 
 }

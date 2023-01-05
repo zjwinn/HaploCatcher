@@ -21,6 +21,7 @@
 #' @export
 #'
 #' @examples
+#'
 #' #read in the genotypic data matrix
 #' data("geno_mat")
 #'
@@ -42,7 +43,7 @@
 #'                    percent_training=0.8, #percentage of genotypes in the training set
 #'                    include_hets=FALSE, #excludes hets in the model
 #'                    include_models=FALSE, #excludes models in results object
-#'                    verbose = FALSE) #excludes text
+#'                    verbose=FALSE) #excludes text
 #'
 #'
 
