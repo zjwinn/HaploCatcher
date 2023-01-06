@@ -70,17 +70,17 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
   for(i in 1:n_perms){
 
     #run function
-    a<-HaploMapper::locus_cv(geno_mat = geno_mat,
-                             gene_file = gene_file,
-                             gene_name = gene_name,
-                             marker_info = marker_info,
-                             chromosome = chromosome,
-                             ncor_markers = ncor_markers,
-                             percent_testing = percent_testing,
-                             percent_training = percent_training,
-                             include_hets = include_hets,
-                             include_models = include_models,
-                             verbose = verbose)
+    a<-HaploCatcher::locus_cv(geno_mat = geno_mat,
+                              gene_file = gene_file,
+                              gene_name = gene_name,
+                              marker_info = marker_info,
+                              chromosome = chromosome,
+                              ncor_markers = ncor_markers,
+                              percent_testing = percent_testing,
+                              percent_training = percent_training,
+                              include_hets = include_hets,
+                              include_models = include_models,
+                              verbose = verbose)
 
     #put in a list object
     results[[base::paste("Permutation_", i, sep = "")]]<-a

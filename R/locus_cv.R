@@ -9,9 +9,9 @@
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
 #' @param percent_testing A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.
 #' @param percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
-#' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not.
-#' @param include_models A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object.
-#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback.
+#' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. Default is FALSE.
+#' @param include_models A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. Default is FALSE.
+#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback.Default is TRUE.
 #'
 #' @return This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.
 #'
@@ -61,9 +61,9 @@ locus_cv<-function(geno_mat,
                    ncor_markers=50,
                    percent_testing=0.2,
                    percent_training=0.8,
-                   include_hets,
-                   include_models,
-                   verbose){
+                   include_hets=FALSE,
+                   include_models=FALSE,
+                   verbose=TRUE){
   #check if
   if(!gene_name %in% gene_file$Gene){
 
