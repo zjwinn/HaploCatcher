@@ -25,11 +25,11 @@
 #'data("marker_info")
 #'
 #'#read in the gene compendium file
-#'data("genecomp")
+#'data("gene_comp")
 #'
 #'#run the function with hets
 #'fit1<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-#'               gene_file=genecomp, #the gene compendium file
+#'               gene_file=gene_comp, #the gene compendium file
 #'               gene_name="sst1_solid_stem", #the name of the gene
 #'               marker_info=marker_info, #the marker information file
 #'               chromosome="3B", #name of the chromosome
@@ -42,7 +42,7 @@
 #'
 #'#fun the function without hets
 #'fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-#'               gene_file=genecomp, #the gene compendium file
+#'               gene_file=gene_comp, #the gene compendium file
 #'               gene_name="sst1_solid_stem", #the name of the gene
 #'               marker_info=marker_info, #the marker information file
 #'               chromosome="3B", #name of the chromosome

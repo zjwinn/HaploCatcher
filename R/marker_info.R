@@ -1,6 +1,6 @@
 #' Model Gene Compendium Data Set
 #'
-#' A data frame which contains marker information of GBS markers found on wheat chromosome 3B. This data pairs with the markers found in "geno_mat" data file associated with the GrainBreed package.
+#' A data frame which contains marker information of GBS markers found on wheat chromosome 3B. This data pairs with the markers found in "geno_mat" data file associated with the HaploCatcher package.
 #'
 #' @format A data frame with 2271 rows and 3 columns:
 #'
