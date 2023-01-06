@@ -13,9 +13,9 @@ locus_cv(
   ncor_markers = 50,
   percent_testing = 0.2,
   percent_training = 0.8,
-  include_hets,
-  include_models,
-  verbose
+  include_hets = FALSE,
+  include_models = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -35,11 +35,11 @@ locus_cv(
 
 \item{percent_training}{A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.}
 
-\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not.}
+\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. Default is FALSE.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object.}
+\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. Default is FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback.}
+\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback.Default is TRUE.}
 }
 \value{
 This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.
@@ -55,11 +55,11 @@ data("geno_mat")
 data("marker_info")
 
 #read in the gene compendium file
-data("genecomp")
+data("gene_comp")
 
 #run the function with hets
 fit1<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-              gene_file=genecomp, #the gene compendium file
+              gene_file=gene_comp, #the gene compendium file
               gene_name="sst1_solid_stem", #the name of the gene
               marker_info=marker_info, #the marker information file
               chromosome="3B", #name of the chromosome
@@ -72,7 +72,7 @@ fit1<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
 
 #fun the function without hets
 fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-              gene_file=genecomp, #the gene compendium file
+              gene_file=gene_comp, #the gene compendium file
               gene_name="sst1_solid_stem", #the name of the gene
               marker_info=marker_info, #the marker information file
               chromosome="3B", #name of the chromosome

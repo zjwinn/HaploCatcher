@@ -59,12 +59,12 @@ data("geno_mat")
 data("marker_info")
 
 #read in the gene compendium file
-data("genecomp")
+data("gene_comp")
 
 #run permutational analysis
 fit<-locus_perm_cv(n_perms = 2, #the number of permutations
                    geno_mat=geno_mat, #the genotypic matrix
-                   gene_file=genecomp, #the gene compendium file
+                   gene_file=gene_comp, #the gene compendium file
                    gene_name="sst1_solid_stem", #the name of the gene
                    marker_info=marker_info, #the marker information file
                    chromosome="3B", #name of the chromosome

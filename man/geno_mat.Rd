@@ -14,9 +14,9 @@ A numeric matrix with 1345 rows and 2271 columns:
 geno_mat
 }
 \description{
-A numeric matrix which contains molecular marker information on 1345 unique genotypes for 2271 SNP markers located on wheat chromosome 3B. This data set corresponds to the information found in the "genecomp" and "marker_info" data sets.
+A numeric matrix which contains molecular marker information on 1345 unique genotypes for 2271 SNP markers located on wheat chromosome 3B. This data set corresponds to the information found in the "gene_comp" and "marker_info" data sets.
 }
 \examples{
-data("genecomp") #lazy loads the dataset for use in the package
+data("geno_mat") #lazy loads the dataset for use in the package
 }
 \keyword{datasets}

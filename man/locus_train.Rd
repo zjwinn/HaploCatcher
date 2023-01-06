@@ -36,7 +36,7 @@ locus_train(
 
 \item{set_seed}{A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, use the function "locus_voting" instead. The default setting is NULL.}
 
-\item{models}{A character string which defines what models are to be ran. K-nearest neighbors is abbreviated as "knn" and random forest is "rf". If both models are desired, use the text string "all". Default setting is "all".}
+\item{models_request}{A character string which defines what models are to be ran. K-nearest neighbors is abbreviated as "knn" and random forest is "rf". If both models are desired, use the text string "all". Default setting is "all".}
 }
 \value{
 This function returns a list of list which contains: "seed", "models_request" ,"models", and "data". The "seed" object is the seed set by the user. If no seed was provided this will appear as a character stating "no_seed_set". The "models_request" item hold the models requested. The "models" object contains the trained models. The "data" object contains the data used to train the models.
@@ -53,11 +53,11 @@ data("geno_mat")
 data("marker_info")
 
 #read in the gene compendium file
-data("genecomp")
+data("gene_comp")
 
 #run the function with hets
 fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
-                  gene_file=genecomp, #the gene compendium file
+                  gene_file=gene_comp, #the gene compendium file
                   gene_name="sst1_solid_stem", #the name of the gene
                   marker_info=marker_info, #the marker information file
                   chromosome="3B", #name of the chromosome

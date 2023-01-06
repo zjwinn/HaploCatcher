@@ -10,13 +10,55 @@
 #'
 #' @examples
 #'
+#'#set seed for reproducible sampling
+#' set.seed(022294)
 #'
+#' #read in the genotypic data matrix
+#' data("geno_mat")
 #'
-geno_pred<-function(geno_train_results,
-                    geno_mat,
-                    genotypes_to_predict){
+#' #read in the marker information
+#' data("marker_info")
+#'
+#' #read in the gene compendium file
+#' data("gene_comp")
+#'
+#' #Note: in practice you would have something like a gene file
+#' #that does not contain any lines you are trying to predict.
+#' #However, this is for illustrative purposes on how to run the function
+#'
+#' #sample data in the gene_comp file to make a traning population
+#' train<-gene_comp[gene_comp$FullSampleName %in%
+#'                    sample(gene_comp$FullSampleName,
+#'                           round(length(gene_comp$FullSampleName)*0.8),0),
+#'                  ]
+#'
+#' #pull vector of names, not in the train, for forward prediction
+#' test<-gene_comp[!gene_comp$FullSampleName
+#'                 %in% train$FullSampleName,
+#'                 "FullSampleName"]
+#'
+#' #run the function with hets
+#' fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
+#'                   gene_file=train, #the gene compendium file
+#'                   gene_name="sst1_solid_stem", #the name of the gene
+#'                   marker_info=marker_info, #the marker information file
+#'                   chromosome="3B", #name of the chromosome
+#'                   ncor_markers=50, #number of markers to retain
+#'                   include_hets=TRUE, #include hets in the model
+#'                   verbose = TRUE, #allows for text and graph output
+#'                   set_seed=022294, #sets a seed for reproduction of results
+#'                   models="all") #sets what models are requested
+#'
+#' #predict the lines in the test population
+#' pred<-locus_pred(locus_train_results=fit1,
+#'                  geno_mat=geno_mat,
+#'                  genotypes_to_predict=test)
+#'
+locus_pred<-function(locus_train_results,
+                     geno_mat,
+                     genotypes_to_predict){
 
-  a<-geno_train_results
+  a<-locus_train_results
   b<-geno_mat
   c<-genotypes_to_predict
 
@@ -27,7 +69,7 @@ geno_pred<-function(geno_train_results,
     rf<-a$trained_models$rf
 
     #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% a$selected_markers$selected_markers]
+    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
 
     #predict
     pred_1=stats::predict(knn, b)
@@ -50,7 +92,7 @@ geno_pred<-function(geno_train_results,
     knn<-a$trained_models$knn
 
     #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% a$selected_markers$selected_markers]
+    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
 
     #predict
     pred_1=stats::predict(knn, b)
@@ -71,7 +113,7 @@ geno_pred<-function(geno_train_results,
     rf<-a$trained_models$rf
 
     #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% a$selected_markers$selected_markers]
+    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
 
     #predict
     pred_2=stats::predict(rf, b)
