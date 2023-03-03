@@ -42,10 +42,9 @@ locus_train(
 This function returns a list of list which contains: "seed", "models_request" ,"models", and "data". The "seed" object is the seed set by the user. If no seed was provided this will appear as a character stating "no_seed_set". The "models_request" item hold the models requested. The "models" object contains the trained models. The "data" object contains the data used to train the models.
 }
 \description{
-Haplotype Prediction: Training Models for Use in Forward Prediction
+This function is used to train a model for use in forward prediction of lines which have no record
 }
 \examples{
-
 #read in the genotypic data matrix
 data("geno_mat")
 
@@ -65,6 +64,5 @@ fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
                   include_hets=TRUE, #include hets in the model
                   verbose = TRUE, #allows for text and graph output
                   set_seed=022294, #sets a seed for reproduction of results
-                  models="all") #sets what models are requested
-
+                  models_request="all") #sets what models are requested
 }

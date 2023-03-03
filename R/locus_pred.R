@@ -9,8 +9,7 @@
 #' @export
 #'
 #' @examples
-#'
-#'#set seed for reproducible sampling
+#' #set seed for reproducible sampling
 #' set.seed(022294)
 #'
 #' #read in the genotypic data matrix
@@ -89,7 +88,7 @@ locus_pred<-function(locus_train_results,
   }else if(a$models_request=="knn"){
 
     #pull models
-    knn<-a$trained_models$knn
+    knn<-a$trained_models
 
     #subset to only have the indiviudals who you want to predict
     b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
@@ -110,7 +109,7 @@ locus_pred<-function(locus_train_results,
   }else if(a$models_request=="rf"){
 
     #pull models
-    rf<-a$trained_models$rf
+    rf<-a$trained_models
 
     #subset to only have the indiviudals who you want to predict
     b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]

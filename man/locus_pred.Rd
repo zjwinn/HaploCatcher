@@ -20,7 +20,6 @@ a data frame with two columns: genotype names and predictions.
 Haplotype Prediction: Using Trained Models to Make Predictions
 }
 \examples{
-
 #set seed for reproducible sampling
 set.seed(022294)
 

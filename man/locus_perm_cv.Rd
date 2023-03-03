@@ -16,7 +16,9 @@ locus_perm_cv(
   percent_training = 0.8,
   include_hets = FALSE,
   include_models = FALSE,
-  verbose = FALSE
+  verbose = FALSE,
+  parallel = FALSE,
+  n_cores = NULL
 )
 }
 \arguments{
@@ -43,15 +45,18 @@ locus_perm_cv(
 \item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.}
 
 \item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.}
+
+\item{parallel}{A logical variable which determines if the user wants the cross validation performed in parallel. Default is FALSE. If the user defines that parallel is TRUE, all visual and textual feedback will not be rendered.}
+
+\item{n_cores}{A numerical vector which denotes the number of cores used for parallel processor. If "parallel" option is TRUE and n_cores is not specified, then the number of available cores minus one will be assigned to processing.}
 }
 \value{
-This function returns a list of list with the following objects: "Overall_Parameters", "By_Class_Parameters", "Overall_Summary", "By_Class_Summary", and "Raw_Permutation_Info". The "Overall_Parameters" data frame contains all the relevant parameters for each permutation overall. The "By_Class_Parameters" data frame contains all the relevant parameters for each permutation by class.The "Overall_Summary" data frame contains all the relevant parameters overall summarized across permutations. The "By_Class_Summary" data frame contains all the relevant parameters by class summariezed across permutations. The "Raw_Permutation_Info" is a list of list which contains each permutations model info as described in the "locus_cv" function.
+This function returns a list of list with the following objects: "Overall_Parameters", "By_Class_Parameters", "Overall_Summary", "By_Class_Summary", and "Raw_Permutation_Info". The "Overall_Parameters" data frame contains all the relevant parameters for each permutation overall. The "By_Class_Parameters" data frame contains all the relevant parameters for each permutation by class.The "Overall_Summary" data frame contains all the relevant parameters overall summarized across permutations. The "By_Class_Summary" data frame contains all the relevant parameters by class summarized across permutations. The "Raw_Permutation_Info" is a list of list which contains each permutations model info as described in the "locus_cv" function.
 }
 \description{
 This function performs the analysis featured in Winn et al 2022 where genome wide markers are used to train machine learning models to identify if genotypes have or do not have specific alleles of a QTL/gene. This function is used to perform cross validation where a random partition of the total available data is used to train a model and a reserved testing partition is used to validate. This function is used for permutation based cross validation.
 }
 \examples{
-
 #read in the genotypic data matrix
 data("geno_mat")
 
@@ -74,6 +79,5 @@ fit<-locus_perm_cv(n_perms = 2, #the number of permutations
                    include_hets=FALSE, #excludes hets in the model
                    include_models=FALSE, #excludes models in results object
                    verbose=FALSE) #excludes text
-
 
 }

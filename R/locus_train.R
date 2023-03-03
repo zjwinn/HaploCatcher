@@ -1,4 +1,7 @@
 #' Haplotype Prediction: Training Models for Use in Forward Prediction
+#'
+#' This function is used to train a model for use in forward prediction of lines which have no record
+#'
 #' @param geno_mat An imputed, number-coded, genotypic matrix which has n rows of individuals and m columns of markers. Row names of the matrix should be representative of genotypic IDs and column names should be representative of marker IDs. Missing data is not allowed. Numeric coding of genotypes can vary as long as it remains consistant among markers.
 #' @param gene_file A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.
 #' @param gene_name A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.
@@ -15,7 +18,6 @@
 #' @export
 #'
 #' @examples
-#'
 #' #read in the genotypic data matrix
 #' data("geno_mat")
 #'
@@ -35,8 +37,8 @@
 #'                   include_hets=TRUE, #include hets in the model
 #'                   verbose = TRUE, #allows for text and graph output
 #'                   set_seed=022294, #sets a seed for reproduction of results
-#'                   models="all") #sets what models are requested
-#'
+#'                   models_request="all") #sets what models are requested
+
 locus_train<-function(geno_mat,
                       gene_file,
                       gene_name,
@@ -244,8 +246,8 @@ locus_train<-function(geno_mat,
   #summary of models
   if(verbose==TRUE){
 
-    base::print(fit_1)
-    base::print(fit_2)
+    if(models_request=="all" | models_request=="knn"){base::print(fit_1)}
+    if(models_request=="all" | models_request=="rf"){base::print(fit_2)}
 
   }
 

@@ -53,6 +53,8 @@
 #'               include_models=FALSE, #excludes models in the final results
 #'               verbose = FALSE) #silences function
 #'
+#'@importFrom ggplot2 ggplot
+#'
 locus_cv<-function(geno_mat,
                    gene_file,
                    gene_name,
