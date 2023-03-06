@@ -69,7 +69,7 @@ locus_cv<-function(geno_mat,
   #check if
   if(!gene_name %in% gene_file$Gene){
 
-    stop("Error:'gene_name' not found in 'geno_file'!")
+    stop("'gene_name' not found in 'geno_file'!")
 
   }
 
@@ -79,34 +79,34 @@ locus_cv<-function(geno_mat,
   #check if
   if(length(classification$FullSampleName[base::duplicated(classification$FullSampleName)])>0){
 
-    base::stop("Error: There are duplicated individuals in the 'gene_file'!")
+    base::stop("There are duplicated individuals in the 'gene_file'!")
 
   }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))=="try-error"){
 
-    base::stop("Error: The 'gene_file' does not have the columns 'Gene', 'FullSampleName', and 'Call'!")
+    base::stop("The 'gene_file' does not have the columns 'Gene', 'FullSampleName', and 'Call'!")
 
   }
 
   #check if
   if(include_hets==FALSE){
 
-    if(verbose==TRUE){base::message("Note: Removing heterozygous calls from the dataframe")}
+    if(verbose==TRUE){base::print("Note: Removing heterozygous calls from the dataframe")}
     classification<-classification[!classification$Call %in% classification$Call[grep("het_", classification$Call)], ]
 
   }else if(!is.logical(include_hets)){
 
-    base::stop("Error: Argument 'include_hets' must be a logical argument! (TRUE or FALSE)")
+    base::stop("Argument 'include_hets' must be a logical argument! (TRUE or FALSE)")
 
   }else{
 
-    if(verbose==TRUE){base::message("Note: User has requested heterozygous calls remain in the dataset")}
+    if(verbose==TRUE){base::print("Note: User has requested heterozygous calls remain in the dataset")}
 
   }
 
   #check if
   if(percent_training>1 | percent_training<0 | !base::is.numeric(percent_training)){
 
-    base::stop("Error: 'percent_training' is a non-integer, numeric variable bound between 0 and 1!")
+    base::stop("'percent_training' is a non-integer, numeric variable bound between 0 and 1!")
 
   }
 
@@ -116,11 +116,11 @@ locus_cv<-function(geno_mat,
   #check if
   if(percent_testing>1 | percent_testing<0 | !base::is.numeric(percent_testing)){
 
-    base::stop("Error: 'percent_testing' is a non-integer, numeric variable bound between 0 and 1!")
+    base::stop("'percent_testing' is a non-integer, numeric variable bound between 0 and 1!")
 
   }else if(percent_training+percent_testing>1){
 
-    base::stop("Error: 'percent_testing'+'percent_training' cannot be greater than 1!")
+    base::stop("'percent_testing'+'percent_training' cannot be greater than 1!")
 
   }
 
@@ -130,11 +130,11 @@ locus_cv<-function(geno_mat,
   #check if
   if(base::unique(base::duplicated(rownames(geno_mat)))>1){
 
-    base::stop("Error: There are duplicated individuals in the 'geno_mat'!")
+    base::stop("There are duplicated individuals in the 'geno_mat'!")
 
   }else if(!base::is.numeric(geno_mat)){
 
-    base::stop("Error: The 'geno_mat' contains non-numeric markers!")
+    base::stop("The 'geno_mat' contains non-numeric markers!")
 
   }
 
@@ -145,11 +145,11 @@ locus_cv<-function(geno_mat,
   #check if
   if(base::class(base::try(base::ncol(marker_info[,c("Marker", "Chromosome", "BP_Position")])))=="try-error"){
 
-    base::stop("Error: columns are misnamed or missing in the 'marker_info'!")
+    base::stop("columns are misnamed or missing in the 'marker_info'!")
 
   }else if(!chromosome %in% marker_info$Chromosome){
 
-    base::stop("Error: 'chromosome' is not defined in the 'marker_info' chromosome column!")
+    base::stop("'chromosome' is not defined in the 'marker_info' chromosome column!")
 
   }
 
@@ -162,7 +162,7 @@ locus_cv<-function(geno_mat,
   #check if
   if(base::unique(training$FullSampleName %in%  base::rownames(geno_matrix))>1){
 
-    base::stop("Error: Individuals in the training parition are not found in the 'geno_mat'!")
+    base::stop("Individuals in the training parition are not found in the 'geno_mat'!")
 
   }
 
