@@ -79,7 +79,7 @@ locus_cv<-function(geno_mat,
   #check if
   if(length(classification$FullSampleName[base::duplicated(classification$FullSampleName)])>0){
 
-    base::stop("There are duplicated individuals in the 'gene_file'!")
+    base::stop("There are duplicated individuals in the 'gene_file' or there are missing FullSampleNames in the 'gene_file'!")
 
   }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))=="try-error"){
 
@@ -417,7 +417,7 @@ locus_cv<-function(geno_mat,
 
   if(include_models==TRUE){
 
-    if(verbose==TRUE){base::message("Note: User has request that models remain in the results object")}
+    if(verbose==TRUE){base::print("Note: User has request that models remain in the results object")}
     results<-base::list(data_frames=data,
                         trained_models=models,
                         test_predictions=preds,
@@ -425,7 +425,7 @@ locus_cv<-function(geno_mat,
 
   }else if(include_models==FALSE){
 
-    if(verbose==TRUE){base::message("Note: User has request that models are omitted from the results object")}
+    if(verbose==TRUE){base::print("Note: User has request that models are omitted from the results object")}
     results<-base::list(data_frames=data,
                         test_predictions=preds,
                         confusion_matrices=confu)
