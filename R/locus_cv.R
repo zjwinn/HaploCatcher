@@ -160,7 +160,7 @@ locus_cv<-function(geno_mat,
   geno_matrix<-geno_matrix[,base::colnames(geno_matrix) %in% selected_markers$Marker]
 
   #check if
-  if(base::unique(training$FullSampleName %in%  base::rownames(geno_matrix))>1){
+  if(base::length(base::unique(training$FullSampleName %in%  base::rownames(geno_matrix)))>1){
 
     base::stop("Individuals in the training parition are not found in the 'geno_mat'!")
 
