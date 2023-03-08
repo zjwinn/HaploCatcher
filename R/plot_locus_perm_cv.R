@@ -98,6 +98,7 @@ plot_locus_perm_cv<-function(results,
     base::print(f)
 
   }else{
+
     a<-results$Overall_Parameters
     b<-ggplot2::ggplot(data = a, ggplot2::aes(y=Accuracy, x=Model, fill=Model))+
       ggplot2::geom_boxplot()+
@@ -113,8 +114,11 @@ plot_locus_perm_cv<-function(results,
                      legend.position = "none")+
       ggplot2::labs(title = "Overall Kappa")
     a<-results$By_Class_Parameters
+    a$Class<-ifelse(a$Class %in% a$Class[grep("non_",a$Class, ignore.case = TRUE)], "-/-",
+                    ifelse(a$Class %in% a$Class[grep("het_", a$Class, ignore.case = TRUE)], "+/-", "+/+"))
+    a$Class<-factor(a$Class, levels = c("+/+", "+/-", "-/-"))
     d<-ggplot2::ggplot(data = a, ggplot2::aes(y=Sensitivity, x=Model, fill=Model))+
-      ggplot2::facet_grid(~base::paste("Class =", Class))+
+      ggplot2::facet_grid(~base::paste(Class))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
@@ -122,7 +126,7 @@ plot_locus_perm_cv<-function(results,
                      legend.position = "none")+
       ggplot2::labs(title = "By-Class Sensitivity")
     e<-ggplot2::ggplot(data = a, ggplot2::aes(y=Specificity, x=Model, fill=Model))+
-      ggplot2::facet_grid(~base::paste("Class =", Class))+
+      ggplot2::facet_grid(~base::paste(Class))+
       ggplot2::geom_boxplot()+
       ggplot2::theme_bw()+
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
