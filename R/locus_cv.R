@@ -88,6 +88,23 @@ locus_cv<-function(geno_mat,
   }
 
   #check if
+  if(include_hets==TRUE){
+
+    if(length(unique(classification$Call))<=2){
+      stop("You specified 'include_hets=TRUE' yet there appears to only be two catigorizations for your call... is your data formatted properly?")
+    }else if(length(unique(classification$Call))>3){
+      stop("There appears to be more than 3 catigories in your gene_file... only biallelic loci are supported at this time! Please properly format your file!")
+    }
+
+  }else if(include_hets==FALSE){
+
+    if(length(unique(classification$Call))>3){
+      stop("There appears to be more than 3 catigories in your gene_file... only biallelic loci are supported at this time! Please properly format your file!")
+    }
+
+  }
+
+  #check if
   if(include_hets==FALSE){
 
     if(verbose==TRUE){base::print("Note: Removing heterozygous calls from the dataframe")}
