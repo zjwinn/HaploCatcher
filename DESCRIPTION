@@ -24,5 +24,7 @@ Depends:
     R (>= 2.10)
 LazyData: true
 Suggests: 
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
