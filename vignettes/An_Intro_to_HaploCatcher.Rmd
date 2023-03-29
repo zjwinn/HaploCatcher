@@ -19,23 +19,21 @@ knitr::opts_chunk$set(
 
 # Rational for HaploCatcher
 
-The HaploCatcher package is based off the work done in Winn et al (2022) which demonstrated that relatively simple machine learning models could be used to generate haplotype information for genome wide genotyped lines. The idea behind this approach was to leverage the historical PCR based marker information in programs to identify haplotypes of interest in early generation material which has been sequenced for genomic selection. This approach offers several distinct advantages for breeding programs:  
+The HaploCatcher package is based on the work done in Winn et al (2022) which demonstrated that relatively simple machine learning models could be used to generate haplotype information for genome-wide genotyped lines. The idea behind this approach was to leverage the historical PCR-based marker information in programs to identify haplotypes of interest in early generation material which has been sequenced for genomic selection. This approach offers several distinct advantages for breeding programs:
 
-1. Lines which are genotyped for genomic selection in early generations, which would not have PCR based markers ran on them, can revive haplotype information which they would otherwise not have. 
+1. Lines that are genotyped for genomic selection in early generations, which would not have PCR-based markers run on them, can receive haplotype information that they would otherwise not have.
 
-2. Users can apply this information for selection of desirable haplotypes in early generations.  
+2. Users can apply this information for selection of desirable haplotypes in early generations.
 
-3. Haplotype information could become available earlier in the breeding process. 
+3. Haplotype information could become available earlier in the breeding process.
 
-4. Haplotypes could be predicted for historical lines for use in estimation of locus effects across time.  
+4. Haplotypes could be predicted for historical lines for use in estimation of locus effects across time.
 
-It was the desire of the development team for HaploCatcher to make a package available for individuals to apply this method in their programs with as little intervention as possible.
-
-In this demonstration we will discuss the potential uses of this package and the file formats required to run the functions in the HaploCatcher package. 
+The development team of HaploCatcher made a package available for individuals to apply this method in their programs with as little intervention as possible. In this demonstration, we will discuss the potential uses of this package and the file formats required to run the functions in the HaploCatcher package.
 
 # Example Datasets Included in HaploCatcher
 
-The data structure of the HaploCatcher package is paramount for its use. Lets take a look at the three necessary data frames that must be available to use this package.
+To use the HaploCatcher package, the data must be structured properly. There are three necessary data frames that must be available to use this package. Let’s take a look at them.
 
 ```{r, loading, echo=FALSE, include=FALSE}
 #library
@@ -50,8 +48,6 @@ data("gene_comp")
 data("marker_info")
 ```
 
-There are three different data frames included in the HaploCatcher package; "geno_mat", "gene_comp", and "marker_info". 
-
 # Data Structure - Gene Compendium
 
 First, lets look at the head of the "gene_comp" file.
@@ -63,23 +59,23 @@ knitr::kable(head(gene_comp),
              caption = "Gene Compendium Input File")
 ```
 
-The gene_comp file is a categorization file made by the user for their specific program. In this file there are seven columns. This is notated as the "gene compendium" or gene_comp for short. 
+The gene_comp file is a categorization file made by the user for their specific program. It contains seven columns which are as follows:
 
-- Trait defines what trait the locus affects; in this case, we are looking at *Sst1* which affects resistance to sawfly in wheat.
+- Trait: Defines what trait the locus affects. In this case, we are looking at Sst1 which affects resistance to sawfly in wheat.
 
-- Chromosome defines what chromosome the gene is located on. This will be specific to a marker_information file later on. 
+- Chromosome: Defines what chromosome the gene is located on. This will be specific to a marker_information file later on.
 
-- Gene defines the name of the gene.
+- Gene: Defines the name of the gene.
 
-- Nursery defines what nursery/program the information was derived from.
+- Nursery: Defines what nursery/program the information was derived from.
 
-- Line defines the "line designation" given to a genotype. The line designation is denoted by the breeder.
+- Line: Defines the “line designation” given to a genotype. The line designation is denoted by the breeder.
 
-- FullSampleName is the name of the line which matches with the row names in the marker matrix.
+- FullSampleName: The name of the line which matches with the row names in the marker matrix.
 
-- Call is the haplotype for that line for that gene. This call column is very important for the functioning of the HaploCatcher package. This package only predicts biallelic loci. The locus can be only homozygous cases or include a heterozygous case. 
+- Call: The haplotype for that line for that gene. This call column is very important for the functioning of the HaploCatcher package. This package only predicts biallelic loci. The locus can be only homozygous cases or include a heterozygous case.
 
-For simplicity in the package, calls for gene haplotypes should be formatted like this 
+For simplicity in the package, calls for gene haplotypes should be formatted like this:
 
 ```{r, display_calls, echo=FALSE}
 #display unique calls
@@ -88,13 +84,11 @@ knitr::kable(data.frame(Call=unique(gene_comp$Call)),
              caption = "Haplotype Calls")
 ```
 
-where the name of the gene "sst1_solid_stem" is the homozygous positive case, the heterozygous case has the string "het_" in front of it like "het_sst1_solid_stem" and the negative case has the string "non_" in front of it like "non_sst1_solid_stem". 
+The heterozygous case has the string “het_” in front of it like “het_sst1_solid_stem” and the negative case has the string “non_” in front of it like “non_sst1_solid_stem”. 
 
-If the user was only providing the positive and negative cases, without the heterozygous case, the format would be the same without "het_" category.  
+If the user wants to only provide the positive and negative cases, without the heterozygous case, the format would be the same without “het_” category. To use the package properly, users must have at least four columns in the data present: FullSampleName, Chromosome, Gene, and Call. Other data may be present. These columns must both be properly named and case correct in the data. 
 
-To use the package properly, users must have at least four columns in the data present: FullSampleName, Chromosome, Gene, and Call. Other data may be present, but those columns, *both properly named and case correct*, must be present in the data.  
-
-For example, if the user was trying to predict the Pm34 locus in wheat with heterozgyous cases, the data frame for the gene_comp would look like this:
+For example, if the user was trying to predict the Pm34 locus in wheat with heterozygous cases, the data frame for the gene_comp would look like this:
 
 ```{r, data_example, echo=FALSE, echo=FALSE}
 #make example data frame
