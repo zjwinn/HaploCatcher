@@ -59,7 +59,8 @@
 #' head(results$predictions)
 #'
 #'@importFrom foreach %dopar%
-#'
+#'@importFrom randomForest randomForest
+#'@importFrom lattice qq
 
 auto_locus<-function(geno_mat, #the genotypic matrix
                      gene_file, #the gene compendium file
