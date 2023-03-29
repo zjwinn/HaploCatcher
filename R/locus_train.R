@@ -9,7 +9,8 @@
 #' @param chromosome A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.
-#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.
+#' @param verbose A logical variable which determines if the user wants text feedback. Default setting is TRUE.
+#' @param graph A logical variable which determines if the user wants graphs displayed. default setting is FALSE.
 #' @param set_seed A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, use the function "locus_voting" instead. The default setting is NULL.
 #' @param models_request A character string which defines what models are to be ran. K-nearest neighbors is abbreviated as "knn" and random forest is "rf". If both models are desired, use the text string "all". Default setting is "all".
 #'
@@ -35,7 +36,7 @@
 #'                   chromosome="3B", #name of the chromosome
 #'                   ncor_markers=50, #number of markers to retain
 #'                   include_hets=TRUE, #include hets in the model
-#'                   verbose = TRUE, #allows for text and graph output
+#'                   verbose = TRUE, #allows for text output
 #'                   set_seed=022294, #sets a seed for reproduction of results
 #'                   models_request="all") #sets what models are requested
 
@@ -48,7 +49,8 @@ locus_train<-function(geno_mat,
                       include_hets=FALSE,
                       verbose=FALSE,
                       set_seed=NULL,
-                      models_request="all"){
+                      models_request="all",
+                      graph=FALSE){
 
   #set seed
   base::set.seed(set_seed)
@@ -77,7 +79,7 @@ locus_train<-function(geno_mat,
   #check if
   if(include_hets==FALSE){
 
-    if(verbose==TRUE){base::message("Note: Removing heterozygous calls from the dataframe")}
+    if(verbose==TRUE){base::print("Note: Removing heterozygous calls from the dataframe")}
     classification<-classification[!classification$Call %in% classification$Call[grep("het_", classification$Call)], ]
 
   }else if(!is.logical(include_hets)){
@@ -86,7 +88,7 @@ locus_train<-function(geno_mat,
 
   }else{
 
-    if(verbose==TRUE){base::message("Note: User has requested heterozygous calls remain in the dataset")}
+    if(verbose==TRUE){base::print("Note: User has requested heterozygous calls remain in the dataset")}
 
   }
 
@@ -139,7 +141,8 @@ locus_train<-function(geno_mat,
   corr[,1:base::ncol(corr)]<-base::lapply(corr[,1:base::ncol(corr)], base::as.numeric)
 
   #perform correlation
-  corr<-base::suppressWarnings(base::round(stats::cor(corr), 10))
+  corr<-base::suppressWarnings(stats::cor(corr))
+  corr<-base::round(corr, 10)
   corr<-base::data.frame("|r|"=corr[-1,1],
                          check.names = FALSE)
   corr$`|r|`<-base::abs(corr$`|r|`)
@@ -148,7 +151,7 @@ locus_train<-function(geno_mat,
   corr$MBP_Position<-base::round(base::as.numeric(corr$BP_Position)/1000000, 2)
 
   #plot results
-  if(verbose==TRUE){
+  if(graph==TRUE){
 
     base::plot(x=corr$MBP_Position,
                y=corr$`|r|`,
@@ -163,7 +166,7 @@ locus_train<-function(geno_mat,
   corr<-corr[1:ncor_markers,]
 
   #plot threshold line
-  if(verbose==TRUE){
+  if(graph==TRUE){
 
     graphics::abline(h=min(corr$`|r|`), col = "red", lty=2)
     graphics::legend("bottomleft",legend=base::paste("Top", ncor_markers, "correlated markers thresold"),  col = "red", lty = 2 )

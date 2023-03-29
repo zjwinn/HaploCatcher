@@ -14,7 +14,8 @@ locus_train(
   include_hets = FALSE,
   verbose = FALSE,
   set_seed = NULL,
-  models_request = "all"
+  models_request = "all",
+  graph = FALSE
 )
 }
 \arguments{
@@ -32,11 +33,13 @@ locus_train(
 
 \item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is FALSE.}
+\item{verbose}{A logical variable which determines if the user wants text feedback. Default setting is TRUE.}
 
 \item{set_seed}{A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, use the function "locus_voting" instead. The default setting is NULL.}
 
 \item{models_request}{A character string which defines what models are to be ran. K-nearest neighbors is abbreviated as "knn" and random forest is "rf". If both models are desired, use the text string "all". Default setting is "all".}
+
+\item{graph}{A logical variable which determines if the user wants graphs displayed. default setting is FALSE.}
 }
 \value{
 This function returns a list of list which contains: "seed", "models_request" ,"models", and "data". The "seed" object is the seed set by the user. If no seed was provided this will appear as a character stating "no_seed_set". The "models_request" item hold the models requested. The "models" object contains the trained models. The "data" object contains the data used to train the models.
@@ -62,7 +65,7 @@ fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
                   chromosome="3B", #name of the chromosome
                   ncor_markers=50, #number of markers to retain
                   include_hets=TRUE, #include hets in the model
-                  verbose = TRUE, #allows for text and graph output
+                  verbose = TRUE, #allows for text output
                   set_seed=022294, #sets a seed for reproduction of results
                   models_request="all") #sets what models are requested
 }

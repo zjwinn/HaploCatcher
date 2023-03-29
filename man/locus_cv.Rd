@@ -15,7 +15,8 @@ locus_cv(
   percent_training = 0.8,
   include_hets = FALSE,
   include_models = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  graph = FALSE
 )
 }
 \arguments{
@@ -39,7 +40,9 @@ locus_cv(
 
 \item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. Default is FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback.Default is TRUE.}
+\item{verbose}{A logical variable which determines if the user wants text feedback. Default is TRUE.}
+
+\item{graph}{A logical variable which determines if the user wants plots displayed. Default is FALSE.}
 }
 \value{
 This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.

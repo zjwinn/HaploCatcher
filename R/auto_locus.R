@@ -24,7 +24,7 @@
 #' @param n_cores A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, set 'predict_by_vote' to true instead. The default setting is NULL.
 #' @param plot_cv_results A logical variable which determines if the user want the cross validation results to be printed as a 'ggplot' image. Default is TRUE
 #'
-#' @return This function returns two types of list-of-list objects. If 'predict_by_vote' is set to FALSE (the default setting), then the list will contain four objects: method, cross_validation_results, prediction_model, and predictions. The method object is a character which denotes what method was used. The cross_validation_results object contains the results of the cross-validation. The prediction model contains the information about the prediction model, and predictions contains the predictions for the testing_genotypes. If 'predict_by_vote' is set to TRUE, then the list will contain four objects: method, cross_validation_results, predictions, and consensus_predictions. Both method and cross_validation_results are the same for this option. Predictions contains the prediction of each model ran to vote. The object consensious_predictions contains a consensious prediction of the alleleic state of a genotype based on majority rule and a tablular summary of how many votes were taken per catigory.
+#' @return This function returns two types of list-of-list objects. If 'predict_by_vote' is set to FALSE (the default setting), then the list will contain four objects: method, cross_validation_results, prediction_model, and predictions. The method object is a character which denotes what method was used. The cross_validation_results object contains the results of the cross-validation. The prediction model contains the information about the prediction model, and predictions contains the predictions for the testing_genotypes. If 'predict_by_vote' is set to TRUE, then the list will contain four objects: method, cross_validation_results, predictions, and consensus_predictions. Both method and cross_validation_results are the same for this option. Predictions contains the prediction of each model ran to vote. The object consensus_predictions contains a consensus prediction of the alleleic state of a genotype based on majority rule and a tablular summary of how many votes were taken per catigory.
 #'
 #' @export
 #'
@@ -245,7 +245,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
         d<-as.data.frame(t(d))
         rownames(d)=NULL
         c<-data.frame(FullSampleName=a[i,1],
-                      Consensious_Call=ifelse(length(c[c$Freq==max(c$Freq), "Var1"])>1, "No_Call", as.character(c[c$Freq==max(c$Freq), "Var1"])),
+                      Consensus_Call=ifelse(length(c[c$Freq==max(c$Freq), "Var1"])>1, "No_Call", as.character(c[c$Freq==max(c$Freq), "Var1"])),
                       d)
         b<-rbind(b,c)
         remove(c,d,e)
@@ -255,7 +255,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
       return_results<-list(method="multiple models - majority rule",
                            cross_validation_results=fit_cv,
                            predictions=a,
-                           consensious_predictions=b)
+                           consensus_predictions=b)
       return(return_results)
 
     }else if(parallel==FALSE){
@@ -304,7 +304,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
         d<-as.data.frame(t(d))
         rownames(d)=NULL
         c<-data.frame(FullSampleName=a[i,1],
-                      Consensious_Call=ifelse(length(c[c$Freq==max(c$Freq), "Var1"])>1, "No_Call", as.character(c[c$Freq==max(c$Freq), "Var1"])),
+                      Consensus_Call=ifelse(length(c[c$Freq==max(c$Freq), "Var1"])>1, "No_Call", as.character(c[c$Freq==max(c$Freq), "Var1"])),
                       d)
         b<-rbind(b,c)
         remove(c,d,e)
@@ -314,7 +314,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
       return_results<-list(method="multiple models - majority rule",
                            cross_validation_results=fit_cv,
                            predictions=a,
-                           consensious_predictions=b)
+                           consensus_predictions=b)
 
       return(return_results)
     }

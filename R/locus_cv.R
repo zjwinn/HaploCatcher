@@ -11,7 +11,8 @@
 #' @param percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. Default is FALSE.
 #' @param include_models A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. Default is FALSE.
-#' @param verbose A logical variable which determines if the user wants plots displayed and text feedback.Default is TRUE.
+#' @param verbose A logical variable which determines if the user wants text feedback. Default is TRUE.
+#' @param graph A logical variable which determines if the user wants plots displayed. Default is FALSE.
 #'
 #' @return This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.
 #'
@@ -65,7 +66,8 @@ locus_cv<-function(geno_mat,
                    percent_training=0.8,
                    include_hets=FALSE,
                    include_models=FALSE,
-                   verbose=TRUE){
+                   verbose=TRUE,
+                   graph=FALSE){
   #check if
   if(!gene_name %in% gene_file$Gene){
 
@@ -201,7 +203,8 @@ locus_cv<-function(geno_mat,
   corr[,1:base::ncol(corr)]<-base::lapply(corr[,1:base::ncol(corr)], base::as.numeric)
 
   #perform correlation
-  corr<-base::suppressWarnings(base::round(stats::cor(corr), 10))
+  corr<-base::suppressWarnings(stats::cor(corr))
+  corr<-base::round(corr, 10)
   corr<-base::data.frame("|r|"=corr[-1,1],
                          check.names = FALSE)
   corr$`|r|`<-base::abs(corr$`|r|`)
@@ -210,7 +213,7 @@ locus_cv<-function(geno_mat,
   corr$MBP_Position<-base::round(base::as.numeric(corr$BP_Position)/1000000, 2)
 
   #plot results
-  if(verbose==TRUE){
+  if(graph==TRUE){
 
     base::plot(x=corr$MBP_Position,
                y=corr$`|r|`,
@@ -225,7 +228,7 @@ locus_cv<-function(geno_mat,
   corr<-corr[1:ncor_markers,]
 
   #plot threshold line
-  if(verbose==TRUE){
+  if(graph==TRUE){
 
     graphics::abline(h=min(corr$`|r|`), col = "red", lty=2)
     graphics::legend("bottomleft",legend=base::paste("Top", ncor_markers, "correlated markers thresold"),  col = "red", lty = 2 )
