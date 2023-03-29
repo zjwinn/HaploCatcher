@@ -38,9 +38,7 @@ To use the HaploCatcher package, the data must be structured properly. There are
 ```{r, loading, echo=FALSE, include=FALSE}
 #library
 suppressWarnings(library(HaploCatcher))
-suppressWarnings(library(lattice))
 suppressWarnings(library(ggplot2))
-suppressWarnings(library(randomForest))
 
 #read data from package
 data("geno_mat")
@@ -111,13 +109,17 @@ The structure of the genotypic matrix is a full-rank (no missing data) numeric m
 #must define as a matrix
 geno_mat<-as.matrix(geno_mat)
 
+#manipulate a little to demonstrate
+geno_mat[1,1]=1
+geno_mat[5,5]=2
+
 #see head
 knitr::kable(geno_mat[1:5, 1:5], 
              align = "c", 
              caption = "Marker Matrix Input File")
 ```
 
-Where the columns of the matrix are markers, the rows of the matrix are genotypes (FullSampleName), and the the marker information is coded numerically. The marker matrix provided in the package is coded 0,1,2 where 0 is the major allele, 1 is the heterozygous haplotype, and 2 is the minor allele. The coding of the matrix must always be numeric, but it can be in any numeric format as long as the numbers are real integers.
+Where the columns of the matrix are markers, the rows of the matrix are genotypes (FullSampleName), and the the marker information is coded numerically. The marker matrix provided in the package is coded as 0, 1,and 2; where 0 is the major allele, 1 is the heterozygous haplotype, and 2 is the minor allele. The coding of the matrix must always be numeric, but it can be in any numeric format as long as the numbers are real integers.
 
  ***Note: the column names must match information provided in the marker info file (see next section) and the row names must match the "FullSampleName" provided in the gene_comp!***
 
@@ -147,7 +149,9 @@ Below is an example where a linkage group and centimorgan position is provided.
 a<-data.frame(Marker=c("TRACE_00102",
                        "TRACE_13112",
                        "TRACE_43821"),
-              Chromosome=c(1, 1, 1),
+              Chromosome=c(1, 
+                           1, 
+                           1),
               BP_Position=c(0.0,
                             0.5,
                             1.2))
