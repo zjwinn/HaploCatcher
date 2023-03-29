@@ -31,7 +31,7 @@ The HaploCatcher package is based on the work done in Winn et al (2022) which de
 
 The development team of HaploCatcher made a package available for individuals to apply this method in their programs with as little intervention as possible. In this demonstration, we will discuss the potential uses of this package and the file formats required to run the functions in the HaploCatcher package.
 
-# Example Datasets Included in HaploCatcher
+# Datasets Included in HaploCatcher
 
 To use the HaploCatcher package, the data must be structured properly. There are three necessary data frames that must be available to use this package. Let’s take a look at them.
 
@@ -48,7 +48,7 @@ data("gene_comp")
 data("marker_info")
 ```
 
-# Data Structure - Gene Compendium
+## Data Structure - Gene Compendium
 
 First, lets look at the head of the "gene_comp" file.
 
@@ -103,9 +103,9 @@ knitr::kable(a,
              caption = "Pm34 Example Input File")
 ```
 
-# Data Structure - Genotypic Matrix
+## Data Structure - Genotypic Matrix
 
-The structure of the genotypic matrix is a full-rank (no missing data) numeric matrix.
+The structure of the genotypic matrix is a full-rank (no missing data) numeric matrix of markers.
 
 ```{r, head_geno_mat, echo=FALSE}
 #must define as a matrix
@@ -117,11 +117,11 @@ knitr::kable(geno_mat[1:5, 1:5],
              caption = "Marker Matrix Input File")
 ```
 
-Where the columns of the matrix are markers, the rows of the matrix are genotypes, and the the marker information is coded numerically. In the marker matrix provided in the package is coded 0,1,2 where 0 is the major allele, 1 is the heterozygous haplotype, and 2 is the minor allele. The coding of the matrix must always be numeric, but it can be in any numeric format as long as the numbers are real integers.
+Where the columns of the matrix are markers, the rows of the matrix are genotypes (FullSampleName), and the the marker information is coded numerically. The marker matrix provided in the package is coded 0,1,2 where 0 is the major allele, 1 is the heterozygous haplotype, and 2 is the minor allele. The coding of the matrix must always be numeric, but it can be in any numeric format as long as the numbers are real integers.
 
  ***Note: the column names must match information provided in the marker info file (see next section) and the row names must match the "FullSampleName" provided in the gene_comp!***
 
-# Data Structure - Marker Information
+## Data Structure - Marker Information
 
 The marker_info file contains information on all the markers found in the columns of the geno_mat file.
 
@@ -134,11 +134,11 @@ knitr::kable(head(marker_info),
 
 The marker_info file has three required columns:
 
-- Marker is the name of the marker which is found in the column names of the marker matrix
+- Marker: The name of the marker which is found in the column names of the marker matrix
 
-- Chromosome is the name of the chromosome (or linkage group) that the marker belongs to
+- Chromosome: The name of the chromosome (or linkage group) that the marker belongs to
 
-- BP_Position is the base pair position of the marker. This can be replaced by a numeric dummy variable or a centimorgan position!
+- BP_Position: The base pair position of the marker. *This can be replaced by a numeric dummy variable or a centimorgan position!*
 
 Below is an example where a linkage group and centimorgan position is provided. 
 
@@ -167,11 +167,11 @@ The total pipeline for the HaploCatcher package can be understood using the prov
 
 ```{r, figure_1, echo=FALSE, fig.align='center', out.width="100%"}
 #pull figure from internet
-url<-"https://raw.githubusercontent.com/zjwinn/HaploCatcher/main/Figure1_For_I_T_HC.png"
+url<-"https://raw.githubusercontent.com/zjwinn/HaploCatcher/main/Figure.png"
 knitr::include_graphics(url)
 ```
 
-**Figure 1.** A diagram of [A] input data structure and [B] the “auto_locus” function pipeline. Panel [A] shows a total data set that is partitioned into a training and test population. The training population in panel [A] shows a population of individuals, that is suggested to be comprised of more than 750 individuals, which have both genome wide marker and historical haplotype data. The testing population in panel [A] shows a testing population, which may be any size greater than zero, which only has genome wide marker data. Panel [B] shows the workflow of the “auto_locus” function. In the cross-validation step [I], the total training population is split in a user defined way (default is 80:20 split) and the 80% tuning population is used to train and select optimal hyper-parameters for a k-nearest neighbors (KNN) and random forest (RF) model. The trained models are then used to predict the haplotype of the validation population. The predicted haplotype is then compared to the ‘true’ haplotype and kappa (and accuracy) are calculated. This is repeated a user set number of times (default is 30). The best performing model based on accuracy or kappa (default is kappa) is then taken as the model to be used in forward prediction. There are two options post cross-validation: [IIA] a single model with a set seed for repeatability or [IIB] a user set number of random models (default is 30) used to create a consensus haplotype prediction.
+***Figure 1.*** *A diagram of [A] input data structure and [B] the “auto_locus” function pipeline. Panel [A] shows a total data set that is partitioned into a training and test population. The training population in panel [A] shows a population of individuals, that is suggested to be comprised of more than 750 individuals, which have both genome wide marker and historical haplotype data. The testing population in panel [A] shows a testing population, which may be any size greater than zero, which only has genome wide marker data. Panel [B] shows the workflow of the “auto_locus” function. In the cross-validation step [I], the total training population is split in a user defined way (default is 80:20 split) and the 80% tuning population is used to train and select optimal hyper-parameters for a k-nearest neighbors (KNN) and random forest (RF) model. The trained models are then used to predict the haplotype of the validation population. The predicted haplotype is then compared to the ‘true’ haplotype and kappa (and accuracy) are calculated. This is repeated a user set number of times (default is 30). The best performing model based on accuracy or kappa (default is kappa) is then taken as the model to be used in forward prediction. There are two options post cross-validation: [IIA] a single model with a set seed for repeatability or [IIB] a user set number of random models (default is 30) used to create a consensus haplotype prediction.*
 
 ----------------------------------------------------------------------------
 
@@ -179,13 +179,13 @@ The HaploCatcher package contains several different functions which are all plac
 
 The "auto_locus" function (Figure 1B) has two distinct steps: (I) Selecting either a random forest or k-nearest neighbors model by cross-validation and (II) using the cross-validation results to select the desired model, training off the total available data, and either (IIA) set a random seed and predict haplotypes once or (IIB) set no random seed and predict many times to get a consensus vote by majority rule (Figure 1B).
 
-# Using the auto_locus Function
+# Using the "auto_locus" Function
 
-Now that we understand the format of the data and the pipeline process, it is time to use the main function "auto_locus"
+Now that we understand the format of the data and the pipeline process, it is time to use the main function "auto_locus".
 
 ## Read in Data from HaploCatcher Package
 
-First, read in the data
+First, read in the data...
 
 ```{r, example_read_data}
 #library
@@ -197,7 +197,7 @@ data("gene_comp")
 data("marker_info")
 ```
 
-In this example, only individuals who are in the gene_comp are found in the geno_mat file provided in the package, so we will have to randomly partition the data so that we can show how this can be used for forward prediction!
+In this example, only individuals who are in the gene_comp are found in the geno_mat file provided in the package, so we will have to randomly partition the data so that we can show how the "auto_locus" function could be used for forward prediction of lines with only genome-wide marker data!
 
 ```{r, example_make_training_and_test}
 #set seed (for reproducible results)
@@ -211,26 +211,28 @@ testing_genotypes=rownames(geno_mat)[!rownames(geno_mat) %in% training_genotypes
 set.seed(NULL)
 ```
 
-In this case we assume that the individuals in the "testing_genotypes" vector **DO NOT** have *Sst1* data associated with them and we are trying to produce a predictive haplotype for these individuals.
+In this example, we assume that the individuals in the "testing_genotypes" vector **DO NOT** have haplotype calls for *Sst1* and we are trying to produce a predictive haplotype for these individuals.
 
 ## Run "auto_locus" models
 
 Now that we have defined our testing and training data sets, we can use these inputs for the auto_locus function. The auto_locus function has eight user defined inputs:
 
-- geno_mat is the genotypic matrix which contains marker information
-- gene_file is the gene compendium file that contains information about the *Sst1* locus
-- gene_name is a character string which defines the name of the gene to be predicted found in the "gene_file" input
-- marker_info is the marker information file that contains all the chromosome and position information about the markers in the "geno_mat" file
-- chromosome is the chromosome that the gene resides upon
-- training_genotypes is a vector of FullSampleNames from the geno_mat row names that defines which individuals are to be used for training of the KNN or RF models
-- testing_genotypes is a vector of FullSampleNames from the geno_mat row names which are to be predicted
-- set_seed is a number used to set the seed of the function. This option must be defined if the "predict_by_vote" function is set to FALSE, which is the default setting.
+- geno_mat: The genotypic matrix which contains marker information
+- gene_file: The gene compendium file that contains information about the *Sst1* locus
+- gene_name: A character string which defines the name of the gene to be predicted found in the "gene_file" input
+- marker_info: The marker information file that contains all the chromosome and position information about the markers in the "geno_mat" file
+- chromosome: The chromosome that the gene resides upon
+- training_genotypes: A vector of FullSampleNames from the geno_mat row names that defines which individuals are to be used for training of the KNN or RF models
+- testing_genotypes: A vector of FullSampleNames from the geno_mat row names which are to be predicted
+- set_seed: A number used to set the seed of the function. This option must be defined if the "predict_by_vote" function is set to FALSE, which is the default setting.
 
-The auto_locus function has many user defined setting that are optional, such as "include_hets" which either allows heterozygous lines to be predicted (TRUE) or not (FALSE). The default is FALSE. 
+The auto_locus function has many user defined setting that are optional, such as "include_hets" which either allows heterozygous lines to be predicted (TRUE) or not (FALSE). The default is FALSE.
 
-Furthermore, there are options for sequential modeling (parallel=FALSE) or parallel modeling (parallel=TRUE), as well as methods to suppress output of text (verbose=FALSE). To save time, we will process one model in parallel (parallel=TRUE) and the other sequentially (parallel=FALSE) to see the output. Sequential processing is the default. 
+***Note: if your data has only positive and negative cases without heterozygous calls, you should set "include_hets" to FALSE, otherwise you will receive an error!***
 
-The example data set for the HaploCatcher package contains heterozygous calls, so we will perform both models using the "include_hets" argument. We will set n_perms=10 for expediency.  
+Furthermore, there are options for sequential modeling (parallel=FALSE) or parallel modeling (parallel=TRUE), as well as methods to suppress output of text (verbose=FALSE).
+
+The example data set for the HaploCatcher package contains heterozygous calls, so we will perform both models using the "include_hets" argument set to FALSE and TRUE. We will also set n_perms=10 for expediency of models, even though the minimum should be 30.  
 
 ```{r, example_models_1, fig.width=12, fig.height=8, fig.align='center', out.width="100%"}
 #run without heterozygous individuals sequentially
@@ -263,7 +265,7 @@ results2<-auto_locus(geno_mat = geno_mat,
 
 ## Identify Location of Predictions in Results Object
 
-Each result obtained puts out a list-of-list objects which contain. 
+Each result obtained puts out a list-of-list objects which contain several portions which can be found in the documentation for the "auto_locus" function. The predictions made for the training population can be found in the results$predictions pathway.
 
 ```{r, display_results}
 #show results for with and without hets
@@ -274,8 +276,6 @@ knitr::kable(results2$predictions[1:15,],
              align = "c", 
              caption = "Heterozygous Included Results")
 ```
-
-Regardless if the "include_hets" argument is set to either TRUE or FALSE, the results should be found in results_object$predictions.
 
 ## Prediction by Voting
 
@@ -303,7 +303,7 @@ knitr::kable(results3$consensus_predictions[1:15,],
              caption = "Consensus Predictions")
 ```
 
-Note that the predictions, when made through voting, may be found in the results$consensus_predictions pathway. This data frame shows the FullSampleName, a haplotype call titled "Consensus_Call" made by majority rule, and the different categories with a number of times the line was identified as that haplotype.
+Note that the predictions, when made through voting, may be found in the results$consensus_predictions pathway. This data frame shows the FullSampleName, a haplotype call titled "Consensus_Call" made by majority rule, and the different potential calls with a number of observations over all permutations of the model.
 
 ## Visualizing Cross-Validation Results
 
@@ -317,7 +317,7 @@ plot_locus_perm_cv(results3$cross_validation_results)
 
 ## Looking at Model Performance Parameters
 
-Each results object has cross validation parameters to check the predictive ability of the data set. To see this, users can access summaries in the list-of-list results object.
+Each results object has cross validation parameters to check the predictive ability of the data set. To see this, users can access summaries in the list-of-list results object. These parameters may be useful for publications or model selection.
 
 ```{r, look_at_summary_results}
 #look at overall and by_class performance
@@ -331,4 +331,8 @@ knitr::kable(results1$cross_validation_results$By_Class_Summary[,1:5],
 
 # Conclusion
 
-Here we showed a short tutorial of how to use the HaploCatcher package. We hoped this was informative for potential users and that this fuels interest in the use of our package. Thank you. 
+In this tutorial, we have demonstrated how to use the HaploCatcher package. We hope that this tutorial has been informative for potential users and that it has fueled interest in the use of our package. We appreciate your interest in our work and thank you for taking the time to learn about HaploCatcher. If you have any further questions or comments, please do not hesitate to contact the package maintainer listed in the package description.
+
+#### References
+
+- Winn, Z.J., Lyerly, J., Ward, B. et al. "Profiling of *Fusarium* head blight resistance QTL haplotypes through molecular markers, genotyping-by-sequencing, and machine learning." Theoretical and Applied Genetics 135, 3177–3194 (2022). https://doi.org/10.1007/s00122-022-04178-w
