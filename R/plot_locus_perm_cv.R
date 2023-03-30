@@ -11,34 +11,12 @@
 #' @export
 #'
 #' @examples
-#'#read in the genotypic data matrix
-#'data("geno_mat")
 #'
-#'#read in the marker information
-#'data("marker_info")
+#' #refer to vignette for an in depth look at the plot_locus_perm_cv function
+#' vignette("An_Intro_to_HaploCatcher", package = "HaploCatcher")
 #'
-#'#read in the gene compendium file
-#'data("gene_comp")
-#'
-#'#run permutational analysis
-#'fit<-locus_perm_cv(n_perms = 3, #the number of permutations
-#'                   geno_mat=geno_mat, #the genotypic matrix
-#'                   gene_file=gene_comp, #the gene compendium file
-#'                   gene_name="sst1_solid_stem", #the name of the gene
-#'                   marker_info=marker_info, #the marker information file
-#'                   chromosome="3B", #name of the chromosome
-#'                   ncor_markers=50, #number of markers to retain
-#'                   percent_testing=0.2, #percentage of genotypes in the validation set
-#'                   percent_training=0.8, #percentage of genotypes in the training set
-#'                   include_hets=TRUE, #includes hets in the model
-#'                   include_models=TRUE, #includes models in results object
-#'                   verbose = TRUE) #includes text/plots
-#'
-#'#plot results
-#'plot_locus_perm_cv(fit,
-#'                   individual_images=TRUE)
-#'
-#'@importFrom patchwork plot_layout
+#' @importFrom patchwork plot_layout
+#' @importFrom ggplot2 ggplot
 
 plot_locus_perm_cv<-function(results,
                              individual_images=FALSE){

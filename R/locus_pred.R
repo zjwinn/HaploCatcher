@@ -9,6 +9,7 @@
 #' @export
 #'
 #' @examples
+#'
 #' #set seed for reproducible sampling
 #' set.seed(022294)
 #'
@@ -28,8 +29,7 @@
 #' #sample data in the gene_comp file to make a traning population
 #' train<-gene_comp[gene_comp$FullSampleName %in%
 #'                    sample(gene_comp$FullSampleName,
-#'                           round(length(gene_comp$FullSampleName)*0.8),0),
-#'                  ]
+#'                           round(length(gene_comp$FullSampleName)*0.8),0),]
 #'
 #' #pull vector of names, not in the train, for forward prediction
 #' test<-gene_comp[!gene_comp$FullSampleName
@@ -37,22 +37,32 @@
 #'                 "FullSampleName"]
 #'
 #' #run the function with hets
-#' fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
-#'                   gene_file=train, #the gene compendium file
-#'                   gene_name="sst1_solid_stem", #the name of the gene
-#'                   marker_info=marker_info, #the marker information file
-#'                   chromosome="3B", #name of the chromosome
-#'                   ncor_markers=50, #number of markers to retain
-#'                   include_hets=TRUE, #include hets in the model
-#'                   verbose = TRUE, #allows for text and graph output
-#'                   set_seed=022294, #sets a seed for reproduction of results
-#'                   models="all") #sets what models are requested
+#' fit<-locus_train(geno_mat=geno_mat, #the genotypic matrix
+#'                  gene_file=train, #the gene compendium file
+#'                  gene_name="sst1_solid_stem", #the name of the gene
+#'                  marker_info=marker_info, #the marker information file
+#'                  chromosome="3B", #name of the chromosome
+#'                  ncor_markers=2, #number of markers to retain
+#'                  n_neighbors=3, #number of neighbors
+#'                  include_hets=FALSE, #include hets in the model
+#'                  verbose = FALSE, #allows for text and graph output
+#'                  set_seed = 022294, #sets a seed for reproduction of results
+#'                  models = "knn") #sets what models are requested
 #'
 #' #predict the lines in the test population
-#' pred<-locus_pred(locus_train_results=fit1,
+#' pred<-locus_pred(locus_train_results=fit,
 #'                  geno_mat=geno_mat,
 #'                  genotypes_to_predict=test)
 #'
+#' #see predictions
+#' head(pred)
+#'
+#' @importFrom randomForest randomForest
+#' @importFrom lattice qq
+#' @importFrom ggplot2 ggplot
+#' @importFrom caret train
+#' @importFrom foreach %dopar%
+
 locus_pred<-function(locus_train_results,
                      geno_mat,
                      genotypes_to_predict){

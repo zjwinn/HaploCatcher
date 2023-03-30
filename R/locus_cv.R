@@ -7,6 +7,7 @@
 #' @param marker_info A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.
 #' @param chromosome A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
+#' @param n_neighbors A numeric variable which represents the number of neighbors to use in KNN. Default is 50.
 #' @param percent_testing A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.
 #' @param percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. Default is FALSE.
@@ -19,55 +20,51 @@
 #' @export
 #'
 #' @examples
-#'#read in the genotypic data matrix
-#'data("geno_mat")
 #'
-#'#read in the marker information
-#'data("marker_info")
+#' #read in the genotypic data matrix
+#' data("geno_mat")
 #'
-#'#read in the gene compendium file
-#'data("gene_comp")
+#' #read in the marker information
+#' data("marker_info")
 #'
-#'#run the function with hets
-#'fit1<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
+#' #read in the gene compendium file
+#' data("gene_comp")
+#'
+#' #run the function without hets for only 3 permutations
+#' fit<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
 #'               gene_file=gene_comp, #the gene compendium file
 #'               gene_name="sst1_solid_stem", #the name of the gene
 #'               marker_info=marker_info, #the marker information file
 #'               chromosome="3B", #name of the chromosome
-#'               ncor_markers=50, #number of markers to retain
+#'               ncor_markers=2, #number of markers to retain
+#'               n_neighbors=1, #number of neighbors
 #'               percent_testing=0.2, #percentage of genotypes in the validation set
 #'               percent_training=0.8, #percentage of genotypes in the training set
-#'               include_hets=TRUE, #include hets in the model
+#'               include_hets=FALSE, #include hets in the model
 #'               include_models=TRUE, #include models in the final results
-#'               verbose = TRUE) #allows for text and graph output
+#'               verbose=TRUE, #allows text output
+#'               graph=TRUE) #allows graph output
 #'
-#'#fun the function without hets
-#'fit2<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-#'               gene_file=gene_comp, #the gene compendium file
-#'               gene_name="sst1_solid_stem", #the name of the gene
-#'               marker_info=marker_info, #the marker information file
-#'               chromosome="3B", #name of the chromosome
-#'               ncor_markers=50, #number of markers to retain
-#'               percent_testing=0.2, #percentage of genotypes in the validation set
-#'               percent_training=0.8, #percentage of genotypes in the training set
-#'               include_hets=FALSE, #excludes hets in the model
-#'               include_models=FALSE, #excludes models in the final results
-#'               verbose = FALSE) #silences function
-#'
-#'@importFrom ggplot2 ggplot
-#'
-locus_cv<-function(geno_mat,
-                   gene_file,
-                   gene_name,
-                   marker_info,
-                   chromosome,
-                   ncor_markers=50,
-                   percent_testing=0.2,
-                   percent_training=0.8,
-                   include_hets=FALSE,
-                   include_models=FALSE,
-                   verbose=TRUE,
-                   graph=FALSE){
+#' @importFrom randomForest randomForest
+#' @importFrom lattice qq
+#' @importFrom ggplot2 ggplot
+#' @importFrom caret train
+#' @importFrom foreach %dopar%
+
+locus_cv<-function(geno_mat, #genotypic matrix
+                   gene_file, #locus info file
+                   gene_name, #name of gene in gene_file
+                   marker_info, #marker information file
+                   chromosome, #chromosome of gene
+                   ncor_markers=50, #number of markers to keep
+                   n_neighbors=50, #number of nearest neighbors
+                   percent_testing=0.2, #percent partition testing
+                   percent_training=0.8, #percent partition training
+                   include_hets=FALSE, #include heterozygous calls
+                   include_models=FALSE, #include the model object form caret
+                   verbose=TRUE, #produce text
+                   graph=FALSE #produce graphs
+                   ){
   #check if
   if(!gene_name %in% gene_file$Gene){
 
@@ -293,10 +290,18 @@ locus_cv<-function(geno_mat,
   #send message
   if(verbose==TRUE){print("Note: Running Models...")}
 
-  #make grid
-  grid_tune<-base::expand.grid(k = base::seq(from = 1,
-                                       to = (base::ncol(test)-2),
-                                       by = 2))
+  if(n_neighbors<=2){
+
+    #make alternate grid
+    grid_tune<-base::expand.grid(k = 1)
+
+  }else{
+
+    #make grid
+    grid_tune<-base::expand.grid(k = base::seq(from = 1,
+                                               to = n_neighbors,
+                                               by = 2))
+  }
 
   #fit model
   fit_1<-caret::train(Call ~ .,
@@ -305,10 +310,22 @@ locus_cv<-function(geno_mat,
                       tuneGrid = grid_tune,
                       trControl = cont_train)
 
-  #make grid
-  grid_tune<-base::expand.grid(mtry = c(1, base::seq(from = 5,
-                                                     to = (base::ncol(test)-2),
-                                                     by = 5)))
+  #check number of markers
+  if(ncor_markers<5){
+
+    #make grid
+    grid_tune<-base::expand.grid(mtry=1)
+
+    }else{
+
+    #make grid
+    grid_tune<-base::expand.grid(mtry = c(1,
+                                          base::seq(from = 0,
+                                                    to = (base::ncol(training)-2),
+                                                    by = 5)[2:length(base::seq(from = 0,
+                                                                               to = (base::ncol(training)-2),
+                                                                               by = 5))]))
+    }
 
   #fit model
   fit_2<-caret::train(Call ~ .,

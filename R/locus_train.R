@@ -8,6 +8,7 @@
 #' @param marker_info A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.
 #' @param chromosome A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
+#' @param n_neighbors A numeric variable which represents the number of neighbors to use in KNN. Default is 50.
 #' @param include_hets A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.
 #' @param verbose A logical variable which determines if the user wants text feedback. Default setting is TRUE.
 #' @param graph A logical variable which determines if the user wants graphs displayed. default setting is FALSE.
@@ -19,6 +20,10 @@
 #' @export
 #'
 #' @examples
+#'
+#' #set seed for reproducible sampling
+#' set.seed(022294)
+#'
 #' #read in the genotypic data matrix
 #' data("geno_mat")
 #'
@@ -28,29 +33,60 @@
 #' #read in the gene compendium file
 #' data("gene_comp")
 #'
+#' #Note: in practice you would have something like a gene file
+#' #that does not contain any lines you are trying to predict.
+#' #However, this is for illustrative purposes on how to run the function
+#'
+#' #sample data in the gene_comp file to make a traning population
+#' train<-gene_comp[gene_comp$FullSampleName %in%
+#'                    sample(gene_comp$FullSampleName,
+#'                           round(length(gene_comp$FullSampleName)*0.8),0),]
+#'
+#' #pull vector of names, not in the train, for forward prediction
+#' test<-gene_comp[!gene_comp$FullSampleName
+#'                 %in% train$FullSampleName,
+#'                 "FullSampleName"]
+#'
 #' #run the function with hets
-#' fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
-#'                   gene_file=gene_comp, #the gene compendium file
-#'                   gene_name="sst1_solid_stem", #the name of the gene
-#'                   marker_info=marker_info, #the marker information file
-#'                   chromosome="3B", #name of the chromosome
-#'                   ncor_markers=50, #number of markers to retain
-#'                   include_hets=TRUE, #include hets in the model
-#'                   verbose = TRUE, #allows for text output
-#'                   set_seed=022294, #sets a seed for reproduction of results
-#'                   models_request="all") #sets what models are requested
+#' fit<-locus_train(geno_mat=geno_mat, #the genotypic matrix
+#'                  gene_file=train, #the gene compendium file
+#'                  gene_name="sst1_solid_stem", #the name of the gene
+#'                  marker_info=marker_info, #the marker information file
+#'                  chromosome="3B", #name of the chromosome
+#'                  ncor_markers=2, #number of markers to retain
+#'                  n_neighbors=3, #number of neighbors
+#'                  include_hets=FALSE, #include hets in the model
+#'                  verbose = FALSE, #allows for text and graph output
+#'                  set_seed = 022294, #sets a seed for reproduction of results
+#'                  models = "knn") #sets what models are requested
+#'
+#' #predict the lines in the test population
+#' pred<-locus_pred(locus_train_results=fit,
+#'                  geno_mat=geno_mat,
+#'                  genotypes_to_predict=test)
+#'
+#' #see predictions
+#' head(pred)
+#'
+#' @importFrom randomForest randomForest
+#' @importFrom lattice qq
+#' @importFrom ggplot2 ggplot
+#' @importFrom caret train
+#' @importFrom foreach %dopar%
 
-locus_train<-function(geno_mat,
-                      gene_file,
-                      gene_name,
-                      marker_info,
-                      chromosome,
-                      ncor_markers=50,
-                      include_hets=FALSE,
-                      verbose=FALSE,
-                      set_seed=NULL,
-                      models_request="all",
-                      graph=FALSE){
+locus_train<-function(geno_mat, #numeric genotypic matrix
+                      gene_file, #locus info file
+                      gene_name, #name of the gene in the gene_file
+                      marker_info, #marker information file
+                      chromosome, #chromosome of gene
+                      ncor_markers=50, #number of correlated markers to use
+                      n_neighbors=50, #number of neighbors
+                      include_hets=FALSE, #include hets in the model
+                      verbose=FALSE, #allows for text outputs
+                      set_seed=NULL, #sets a seed for reproduction of results
+                      models_request="all", #sets what models are requested
+                      graph=FALSE #allows for graphical outputs
+                      ){
 
   #set seed
   base::set.seed(set_seed)
@@ -210,10 +246,20 @@ locus_train<-function(geno_mat,
   #send message
   if(verbose==TRUE){print("Note: Running Models...")}
 
-  #make grid
-  grid_tune<-base::expand.grid(k = base::seq(from = 1,
-                                             to = (base::ncol(training)-2),
-                                             by = 2))
+  #check number of markers
+  if(n_neighbors<=2){
+
+    #make alternate grid
+    grid_tune<-base::expand.grid(k =1)
+
+  }else{
+
+    #make grid
+    grid_tune<-base::expand.grid(k = base::seq(from = 1,
+                                               to = n_neighbors,
+                                               by = 2))
+  }
+
 
   #fit model
   if(models_request=="all" | models_request=="knn"){
@@ -226,10 +272,22 @@ locus_train<-function(geno_mat,
 
   }
 
-  #make grid
-  grid_tune<-base::expand.grid(mtry = c(1, base::seq(from = 5,
-                                                     to = (base::ncol(training)-2),
-                                                     by = 5)))
+  #check number of markers
+  if(ncor_markers<5){
+
+    #make grid
+    grid_tune<-base::expand.grid(mtry=1)
+
+  }else{
+
+    #make grid
+    grid_tune<-base::expand.grid(mtry = c(1,
+                                          base::seq(from = 0,
+                                                    to = (base::ncol(training)-2),
+                                                    by = 5)[2:length(base::seq(from = 0,
+                                                                               to = (base::ncol(training)-2),
+                                                                               by = 5))]))
+  }
 
   #fit model
   if(models_request=="all" | models_request=="rf"){

@@ -12,6 +12,7 @@ locus_perm_cv(
   marker_info,
   chromosome,
   ncor_markers = 50,
+  n_neighbors = 50,
   percent_testing = 0.2,
   percent_training = 0.8,
   include_hets = FALSE,
@@ -36,6 +37,8 @@ locus_perm_cv(
 
 \item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
 
+\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
+
 \item{percent_testing}{A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.}
 
 \item{percent_training}{A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.}
@@ -57,6 +60,7 @@ This function returns a list of list with the following objects: "Overall_Parame
 This function performs the analysis featured in Winn et al 2022 where genome wide markers are used to train machine learning models to identify if genotypes have or do not have specific alleles of a QTL/gene. This function is used to perform cross validation where a random partition of the total available data is used to train a model and a reserved testing partition is used to validate. This function is used for permutation based cross validation.
 }
 \examples{
+
 #read in the genotypic data matrix
 data("geno_mat")
 
@@ -66,18 +70,22 @@ data("marker_info")
 #read in the gene compendium file
 data("gene_comp")
 
-#run permutational analysis
-fit<-locus_perm_cv(n_perms = 2, #the number of permutations
-                   geno_mat=geno_mat, #the genotypic matrix
-                   gene_file=gene_comp, #the gene compendium file
-                   gene_name="sst1_solid_stem", #the name of the gene
-                   marker_info=marker_info, #the marker information file
-                   chromosome="3B", #name of the chromosome
-                   ncor_markers=50, #number of markers to retain
-                   percent_testing=0.2, #percentage of genotypes in the validation set
-                   percent_training=0.8, #percentage of genotypes in the training set
-                   include_hets=FALSE, #excludes hets in the model
-                   include_models=FALSE, #excludes models in results object
-                   verbose=FALSE) #excludes text
+#run permutational analysis - commented out for package specifications
+#to run, copy and paste without '#' into the console
+
+#fit<-locus_perm_cv(n_perms = 10, #the number of permutations
+#                   geno_mat=geno_mat, #the genotypic matrix
+#                   gene_file=gene_comp, #the gene compendium file
+#                   gene_name="sst1_solid_stem", #the name of the gene
+#                   marker_info=marker_info, #the marker information file
+#                   chromosome="3B", #name of the chromosome
+#                   ncor_markers= 25, #number of markers to retain
+#                   n_neighbors = 25, #number of nearest-neighbors
+#                   percent_testing=0.2, #percentage of genotypes in the validation set
+#                   percent_training=0.8, #percentage of genotypes in the training set
+#                   include_hets=FALSE, #excludes hets in the model
+#                   include_models=FALSE, #excludes models in results object
+#                   verbose = FALSE) #excludes text
+
 
 }

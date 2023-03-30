@@ -11,6 +11,7 @@ locus_train(
   marker_info,
   chromosome,
   ncor_markers = 50,
+  n_neighbors = 50,
   include_hets = FALSE,
   verbose = FALSE,
   set_seed = NULL,
@@ -31,6 +32,8 @@ locus_train(
 
 \item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
 
+\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
+
 \item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
 
 \item{verbose}{A logical variable which determines if the user wants text feedback. Default setting is TRUE.}
@@ -48,6 +51,10 @@ This function returns a list of list which contains: "seed", "models_request" ,"
 This function is used to train a model for use in forward prediction of lines which have no record
 }
 \examples{
+
+#set seed for reproducible sampling
+set.seed(022294)
+
 #read in the genotypic data matrix
 data("geno_mat")
 
@@ -57,15 +64,39 @@ data("marker_info")
 #read in the gene compendium file
 data("gene_comp")
 
+#Note: in practice you would have something like a gene file
+#that does not contain any lines you are trying to predict.
+#However, this is for illustrative purposes on how to run the function
+
+#sample data in the gene_comp file to make a traning population
+train<-gene_comp[gene_comp$FullSampleName \%in\%
+                   sample(gene_comp$FullSampleName,
+                          round(length(gene_comp$FullSampleName)*0.8),0),]
+
+#pull vector of names, not in the train, for forward prediction
+test<-gene_comp[!gene_comp$FullSampleName
+                \%in\% train$FullSampleName,
+                "FullSampleName"]
+
 #run the function with hets
-fit1<-locus_train(geno_mat=geno_mat, #the genotypic matrix
-                  gene_file=gene_comp, #the gene compendium file
-                  gene_name="sst1_solid_stem", #the name of the gene
-                  marker_info=marker_info, #the marker information file
-                  chromosome="3B", #name of the chromosome
-                  ncor_markers=50, #number of markers to retain
-                  include_hets=TRUE, #include hets in the model
-                  verbose = TRUE, #allows for text output
-                  set_seed=022294, #sets a seed for reproduction of results
-                  models_request="all") #sets what models are requested
+fit<-locus_train(geno_mat=geno_mat, #the genotypic matrix
+                 gene_file=train, #the gene compendium file
+                 gene_name="sst1_solid_stem", #the name of the gene
+                 marker_info=marker_info, #the marker information file
+                 chromosome="3B", #name of the chromosome
+                 ncor_markers=2, #number of markers to retain
+                 n_neighbors=3, #number of neighbors
+                 include_hets=FALSE, #include hets in the model
+                 verbose = FALSE, #allows for text and graph output
+                 set_seed = 022294, #sets a seed for reproduction of results
+                 models = "knn") #sets what models are requested
+
+#predict the lines in the test population
+pred<-locus_pred(locus_train_results=fit,
+                 geno_mat=geno_mat,
+                 genotypes_to_predict=test)
+
+#see predictions
+head(pred)
+
 }

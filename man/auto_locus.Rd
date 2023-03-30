@@ -13,6 +13,7 @@ auto_locus(
   training_genotypes,
   testing_genotypes,
   ncor_markers = 50,
+  n_neighbors = 50,
   cv_percent_testing = 0.2,
   cv_percent_training = 0.8,
   n_perms = 30,
@@ -44,6 +45,8 @@ auto_locus(
 \item{testing_genotypes}{A character vector of fullsamplenames found in the geno_mat. These are lines which will have predictions made for them.}
 
 \item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
+
+\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
 
 \item{cv_percent_testing}{A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.}
 
@@ -78,33 +81,8 @@ This function returns two types of list-of-list objects. If 'predict_by_vote' is
 This function takes all other functions of the HaploCatcher package and weaves them into one pipeline that performs locus prediction with minimal user intervention.
 }
 \examples{
-#read in the genotypic data matrix
-data("geno_mat")
 
-#read in the marker information
-data("marker_info")
-
-#read in the gene compendium file
-data("gene_comp")
-
-#split the total data into training and test
-set.seed(022294)
-training_genotypes=sample(rownames(geno_mat), size = round(nrow(geno_mat)*0.8, 0))
-testing_genotypes=rownames(geno_mat)[!rownames(geno_mat) \%in\% training_genotypes]
-set.seed(NULL)
-
-#run auto_locus base function with minimum needed input for three iterations
-results<-auto_locus(geno_mat = geno_mat,
-                    gene_file = gene_comp,
-                    gene_name = "sst1_solid_stem",
-                    marker_info = marker_info,
-                    chromosome = "3B",
-                    training_genotypes = training_genotypes,
-                    testing_genotypes = testing_genotypes,
-                    set_seed = 022294,
-                    n_perms=3)
-
-#look at predictions
-head(results$predictions)
+#refer to vignette for an in depth look at the auto_locus function
+vignette("An_Intro_to_HaploCatcher", package = "HaploCatcher")
 
 }

@@ -7,6 +7,7 @@
 #' @param gene_file A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.
 #' @param gene_name A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.
 #' @param marker_info A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.
+#' @param n_neighbors A numeric variable which represents the number of neighbors to use in KNN. Default is 50.
 #' @param chromosome A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
 #' @param percent_testing A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.
@@ -23,6 +24,7 @@
 #' @export
 #'
 #' @examples
+#'
 #' #read in the genotypic data matrix
 #' data("geno_mat")
 #'
@@ -32,21 +34,29 @@
 #' #read in the gene compendium file
 #' data("gene_comp")
 #'
-#' #run permutational analysis
-#' fit<-locus_perm_cv(n_perms = 2, #the number of permutations
-#'                    geno_mat=geno_mat, #the genotypic matrix
-#'                    gene_file=gene_comp, #the gene compendium file
-#'                    gene_name="sst1_solid_stem", #the name of the gene
-#'                    marker_info=marker_info, #the marker information file
-#'                    chromosome="3B", #name of the chromosome
-#'                    ncor_markers=50, #number of markers to retain
-#'                    percent_testing=0.2, #percentage of genotypes in the validation set
-#'                    percent_training=0.8, #percentage of genotypes in the training set
-#'                    include_hets=FALSE, #excludes hets in the model
-#'                    include_models=FALSE, #excludes models in results object
-#'                    verbose=FALSE) #excludes text
+#' #run permutational analysis - commented out for package specifications
+#' #to run, copy and paste without '#' into the console
 #'
-#'@importFrom foreach %dopar%
+#' #fit<-locus_perm_cv(n_perms = 10, #the number of permutations
+#' #                   geno_mat=geno_mat, #the genotypic matrix
+#' #                   gene_file=gene_comp, #the gene compendium file
+#' #                   gene_name="sst1_solid_stem", #the name of the gene
+#' #                   marker_info=marker_info, #the marker information file
+#' #                   chromosome="3B", #name of the chromosome
+#' #                   ncor_markers= 25, #number of markers to retain
+#' #                   n_neighbors = 25, #number of nearest-neighbors
+#' #                   percent_testing=0.2, #percentage of genotypes in the validation set
+#' #                   percent_training=0.8, #percentage of genotypes in the training set
+#' #                   include_hets=FALSE, #excludes hets in the model
+#' #                   include_models=FALSE, #excludes models in results object
+#' #                   verbose = FALSE) #excludes text
+#'
+#'
+#' @importFrom randomForest randomForest
+#' @importFrom lattice qq
+#' @importFrom ggplot2 ggplot
+#' @importFrom caret train
+#' @importFrom foreach %dopar%
 
 locus_perm_cv<-function(n_perms=30, #number of permutations
                         geno_mat, #the genotypic matrix
@@ -55,13 +65,15 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
                         marker_info, #the marker information file
                         chromosome, #name of the chromosome
                         ncor_markers=50, #number of markers to retain
+                        n_neighbors=50, #number of nearest neighbors to use
                         percent_testing=0.2, #percentage of genotypes in the validation set
                         percent_training=0.8, #percentage of genotypes in the training set
                         include_hets=FALSE, #include hets in the model
                         include_models=FALSE, #include models,
-                        verbose=FALSE,
-                        parallel=FALSE,
-                        n_cores=NULL){ #include text/graph feedback
+                        verbose=FALSE, #if the function should put out text
+                        parallel=FALSE, #if the function should be ran in parallel
+                        n_cores=NULL #number of cores to use
+                        ){
 
   #check inputs
   if(!is.logical(parallel)){
@@ -123,6 +135,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
                                 marker_info = marker_info,
                                 chromosome = chromosome,
                                 ncor_markers = ncor_markers,
+                                n_neighbors = n_neighbors,
                                 percent_testing = percent_testing,
                                 percent_training = percent_training,
                                 include_hets = include_hets,
@@ -166,6 +179,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
                                 marker_info = marker_info,
                                 chromosome = chromosome,
                                 ncor_markers = ncor_markers,
+                                n_neighbors = n_neighbors,
                                 percent_testing = percent_testing,
                                 percent_training = percent_training,
                                 include_hets = include_hets,

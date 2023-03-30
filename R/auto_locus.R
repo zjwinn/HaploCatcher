@@ -10,6 +10,7 @@
 #' @param training_genotypes A character vector of fullsamplenames found in the geno_mat and gene_file. These are lines which will be used in cross validation and to train the model which will predict the lines which have no locus call available.
 #' @param testing_genotypes A character vector of fullsamplenames found in the geno_mat. These are lines which will have predictions made for them.
 #' @param ncor_markers A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.
+#' @param n_neighbors A numeric variable which represents the number of neighbors to use in KNN. Default is 50.
 #' @param cv_percent_testing A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.
 #' @param cv_percent_training A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.
 #' @param n_perms A numeric variable defining the number of permutations to perform. This value may range from one to infinity. Default is 30.
@@ -29,38 +30,16 @@
 #' @export
 #'
 #' @examples
-#' #read in the genotypic data matrix
-#' data("geno_mat")
 #'
-#' #read in the marker information
-#' data("marker_info")
+#' #refer to vignette for an in depth look at the auto_locus function
+#' vignette("An_Intro_to_HaploCatcher", package = "HaploCatcher")
 #'
-#' #read in the gene compendium file
-#' data("gene_comp")
-#'
-#' #split the total data into training and test
-#' set.seed(022294)
-#' training_genotypes=sample(rownames(geno_mat), size = round(nrow(geno_mat)*0.8, 0))
-#' testing_genotypes=rownames(geno_mat)[!rownames(geno_mat) %in% training_genotypes]
-#' set.seed(NULL)
-#'
-#' #run auto_locus base function with minimum needed input for three iterations
-#' results<-auto_locus(geno_mat = geno_mat,
-#'                     gene_file = gene_comp,
-#'                     gene_name = "sst1_solid_stem",
-#'                     marker_info = marker_info,
-#'                     chromosome = "3B",
-#'                     training_genotypes = training_genotypes,
-#'                     testing_genotypes = testing_genotypes,
-#'                     set_seed = 022294,
-#'                     n_perms=3)
-#'
-#' #look at predictions
-#' head(results$predictions)
-#'
-#'@importFrom foreach %dopar%
-#'@importFrom randomForest randomForest
-#'@importFrom lattice qq
+#' @importFrom randomForest randomForest
+#' @importFrom lattice qq
+#' @importFrom ggplot2 ggplot
+#' @importFrom caret train
+#' @importFrom foreach %dopar%
+
 
 auto_locus<-function(geno_mat, #the genotypic matrix
                      gene_file, #the gene compendium file
@@ -69,13 +48,14 @@ auto_locus<-function(geno_mat, #the genotypic matrix
                      chromosome, #name of the chromosome
                      training_genotypes, #vector of genotypes for training
                      testing_genotypes, #vector of genotypes for testing
-                     ncor_markers=50, #number of markers to retain
+                     ncor_markers=50,#number of markers to retain
+                     n_neighbors=50, #number of neighbors
                      cv_percent_testing=0.2, #percentage of genotypes in the validation set
                      cv_percent_training=0.8, #percentage of genotypes in the training set
                      n_perms=30, #number of permutation
                      model_selection_parameter="kappa", #method for CV model selection
                      n_votes=30,#number of votes
-                     set_seed=NULL, #set the seed for reproducability
+                     set_seed=NULL, #set the seed for reproduction of results
                      predict_by_vote=FALSE, #give predictions by voting
                      include_hets=FALSE, #include hets in the model
                      include_models=FALSE, #include models of cross validation set
@@ -107,6 +87,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
                                       marker_info = marker_info, #the marker information file
                                       chromosome = chromosome, #name of the chromosome
                                       ncor_markers = ncor_markers, #number of markers to retain
+                                      n_neighbors = n_neighbors, #number of neighbors
                                       percent_testing = cv_percent_testing, #percentage of genotypes in the validation set
                                       percent_training = cv_percent_training, #percentage of genotypes in the training set
                                       include_hets = include_hets, #excludes hets in the model
@@ -139,7 +120,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
     model_selected<-fit_cv$Overall_Summary[fit_cv$Overall_Summary$Mean_Kappa==max(fit_cv$Overall_Summary$Mean_Kappa),"Model"]
 
     #rename
-    if (model_selected=="Random Forest"){
+    if(model_selected=="Random Forest"){
       model_selected="rf"
     }else if(model_selected=="K-Nearest Neighbors"){
       model_selected="knn"
@@ -150,7 +131,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
       model_selected=as.character(model_selected[model_selected$rand==max(model_selected$rand), 1])
     }
 
-  }else if (model_selection_parameter=="accuracy"){
+    }else if (model_selection_parameter=="accuracy"){
 
     #pull model
     model_selected<-fit_cv$Overall_Summary[fit_cv$Overall_Summary$Mean_Accuracy==max(fit_cv$Overall_Summary$Mean_Accuracy),"Model"]
@@ -204,7 +185,8 @@ auto_locus<-function(geno_mat, #the genotypic matrix
                                        gene_name = gene_name, #the name of the gene
                                        marker_info = marker_info, #the marker information file
                                        chromosome = chromosome, #name of the chromosome
-                                       ncor_markers = ncor_markers, #number of markers to retain
+                                       ncor_markers = ncor_markers,#number of markers to retain
+                                       n_neighbors = n_neighbors, #number of neighbors
                                        include_hets = include_hets, #include hets in the model
                                        verbose = verbose, #allows for text and graph output
                                        set_seed = set_seed, #sets a seed for reproduction of results
@@ -271,6 +253,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
                                        marker_info = marker_info, #the marker information file
                                        chromosome = chromosome, #name of the chromosome
                                        ncor_markers = ncor_markers, #number of markers to retain
+                                       n_neighbors = n_neighbors, #number of neighbors
                                        include_hets = include_hets, #include hets in the model
                                        verbose = verbose, #allows for text and graph output
                                        set_seed = set_seed, #sets a seed for reproduction of results
@@ -329,6 +312,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
                                    marker_info = marker_info, #the marker information file
                                    chromosome = chromosome, #name of the chromosome
                                    ncor_markers = ncor_markers, #number of markers to retain
+                                   n_neighbors = n_neighbors, #number of neighbors
                                    include_hets = include_hets, #include hets in the model
                                    verbose = verbose, #allows for text and graph output
                                    set_seed = set_seed, #sets a seed for reproduction of results
