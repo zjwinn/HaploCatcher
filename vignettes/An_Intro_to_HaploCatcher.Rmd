@@ -285,28 +285,6 @@ knitr::kable(results2$predictions[1:15,],
 
 For users who do not want to run a single final model with a set seed, there is the "predict_by_vote" option, which runs a series of random models to get a majority rule vote. Here we set the number of votes to 10 with the "n_votes" argument and the number of cross-validation permutations to 10 with the "n_perms" argument. We also silence the output using the "verbose=FALSE" argument.
 
-```{r, predict_by_vote_model, fig.width=12, fig.height=8, fig.align='center', out.width="100%"}
-#prediction by voting
-results3<-auto_locus(geno_mat = geno_mat,
-                     gene_file = gene_comp,
-                     gene_name = "sst1_solid_stem",
-                     marker_info = marker_info,
-                     chromosome = "3B",
-                     training_genotypes = training_genotypes,
-                     testing_genotypes = testing_genotypes,
-                     include_hets = TRUE,
-                     verbose = FALSE,
-                     predict_by_vote = TRUE,
-                     n_votes = 10,
-                     n_perms = 10,
-                     plot_cv_results = FALSE)
-
-#show predictions
-knitr::kable(results3$consensus_predictions[1:15,], 
-             align = "c", 
-             caption = "Consensus Predictions")
-```
-
 Note that the predictions, when made through voting, may be found in the results$consensus_predictions pathway. This data frame shows the FullSampleName, a haplotype call titled "Consensus_Call" made by majority rule, and the different potential calls with a number of observations over all permutations of the model.
 
 ## Visualizing Cross-Validation Results
@@ -315,7 +293,7 @@ If users which to visualize the cross-validation results outside of the model, t
 
 ```{r, visualize_cross_validation, fig.width=12, fig.height=8, fig.align='center', out.width="100%"}
 #plot out the cross validation results
-plot_locus_perm_cv(results3$cross_validation_results)
+plot_locus_perm_cv(results1$cross_validation_results)
 ```
 
 

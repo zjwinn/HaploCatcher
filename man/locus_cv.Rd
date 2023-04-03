@@ -64,19 +64,21 @@ data("marker_info")
 #read in the gene compendium file
 data("gene_comp")
 
-#run the function without hets for only 3 permutations
-fit<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
-              gene_file=gene_comp, #the gene compendium file
-              gene_name="sst1_solid_stem", #the name of the gene
-              marker_info=marker_info, #the marker information file
-              chromosome="3B", #name of the chromosome
-              ncor_markers=2, #number of markers to retain
-              n_neighbors=1, #number of neighbors
-              percent_testing=0.2, #percentage of genotypes in the validation set
-              percent_training=0.8, #percentage of genotypes in the training set
-              include_hets=FALSE, #include hets in the model
-              include_models=TRUE, #include models in the final results
-              verbose=TRUE, #allows text output
-              graph=TRUE) #allows graph output
+#run the function without hets for a very limited number of markers and neighbors
+#due to requirements by cran, this must be commented out
+#to run, place this code in the console and remove comments
+#fit<-locus_cv(geno_mat=geno_mat, #the genotypic matrix
+#             gene_file=gene_comp, #the gene compendium file
+#             gene_name="sst1_solid_stem", #the name of the gene
+#             marker_info=marker_info, #the marker information file
+#             chromosome="3B", #name of the chromosome
+#             ncor_markers=2, #number of markers to retain
+#             n_neighbors=1, #number of neighbors
+#             percent_testing=0.2, #percentage of genotypes in the validation set
+#             percent_training=0.8, #percentage of genotypes in the training set
+#             include_hets=FALSE, #include hets in the model
+#             include_models=TRUE, #include models in the final results
+#             verbose=TRUE, #allows text output
+#             graph=TRUE) #allows graph output
 
 }
