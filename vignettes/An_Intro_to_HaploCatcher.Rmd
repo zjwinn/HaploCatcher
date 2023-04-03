@@ -236,7 +236,7 @@ The auto_locus function has many user defined setting that are optional, such as
 
 Furthermore, there are options for sequential modeling (parallel=FALSE) or parallel modeling (parallel=TRUE), as well as methods to suppress output of text (verbose=FALSE).
 
-The example data set for the HaploCatcher package contains heterozygous calls, so we will perform both models using the "include_hets" argument set to FALSE and TRUE. We will also set n_perms=10 for expediency of models, even though the minimum should be 30.  
+The example data set for the HaploCatcher package contains heterozygous calls, so we will perform models using the "include_hets" argument set to FALSE. We will also set n_perms=5 for expediency of models, even though the minimum should be 30.  
 
 ```{r, example_models_1, fig.width=12, fig.height=8, fig.align='center', out.width="100%"}
 #run without heterozygous individuals sequentially
@@ -248,22 +248,7 @@ results1<-auto_locus(geno_mat = geno_mat,
                      training_genotypes = training_genotypes,
                      testing_genotypes = testing_genotypes,
                      set_seed = 022294,
-                     n_perms = 10,
-                     verbose = FALSE)
-```
-
-```{r, example_models_2, fig.width=12, fig.height=8, fig.align='center', out.width="100%"}
-#run with heterozygous individuals in parallel
-results2<-auto_locus(geno_mat = geno_mat,
-                     gene_file = gene_comp,
-                     gene_name = "sst1_solid_stem",
-                     marker_info = marker_info,
-                     chromosome = "3B",
-                     training_genotypes = training_genotypes,
-                     testing_genotypes = testing_genotypes,
-                     set_seed = 022294,
-                     include_hets = TRUE,
-                     n_perms = 10,
+                     n_perms = 5,
                      verbose = FALSE)
 ```
 
@@ -276,9 +261,6 @@ Each result obtained puts out a list-of-list objects which contain several porti
 knitr::kable(results1$predictions[1:15,], 
              align = "c", 
              caption = "Heterozygous Excluded Results")
-knitr::kable(results2$predictions[1:15,], 
-             align = "c", 
-             caption = "Heterozygous Included Results")
 ```
 
 ## Prediction by Voting
