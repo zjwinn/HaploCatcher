@@ -248,7 +248,7 @@ results1<-auto_locus(geno_mat = geno_mat,
                      training_genotypes = training_genotypes,
                      testing_genotypes = testing_genotypes,
                      set_seed = 022294,
-                     n_perms = 5,
+                     n_perms = 10,
                      verbose = FALSE)
 ```
 
