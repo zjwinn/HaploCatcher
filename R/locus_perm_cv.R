@@ -516,8 +516,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
     return_results[["Raw_Permutation_Info"]]<-results
 
     #check
-    if(length(unique(return_results$Overall_Summary$Model))==1 &
-       unique(return_results$Overall_Summary$Model)=="Random Forest"){
+    if(length(unique(return_results$Overall_Summary$Model))==1){
 
       warning("It appears that too many ties were identified in the K-Nearest Neighbors predictions... Check your results object for NAs!")
 
