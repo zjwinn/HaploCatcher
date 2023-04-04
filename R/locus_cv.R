@@ -107,6 +107,11 @@ locus_cv<-function(geno_mat, #genotypic matrix
   }
 
   #check if
+  if(length(unique(classification$Call))==1){
+    stop("There appears to only be one catigorization in your gene data; models cannot be trained on a single call. There must be negative cases present in the data!")
+  }
+
+  #check if
   if(include_hets==FALSE){
 
     if(verbose==TRUE){base::print("Note: Removing heterozygous calls from the dataframe")}
