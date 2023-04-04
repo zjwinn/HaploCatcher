@@ -307,11 +307,30 @@ locus_cv<-function(geno_mat, #genotypic matrix
   }
 
   #fit model
-  fit_1<-caret::train(Call ~ .,
-                      data = training[,-1],
-                      method = "knn",
-                      tuneGrid = grid_tune,
-                      trControl = cont_train)
+  fit_1<-try(caret::train(Call ~ .,
+                          data = training[,-1],
+                          method = "knn",
+                          tuneGrid = grid_tune,
+                          trControl = cont_train))
+
+  if(class(fit_1)[1]=="try-error"){
+
+    warning("There appears to be something wrong with repeated CV approach in KNN. Switching to leave one observation out")
+    cont_train_alt<-caret::trainControl(method="LOOCV")
+    fit_1<-try(caret::train(Call ~ .,
+                            data = training[,-1],
+                            method = "knn",
+                            tuneGrid = grid_tune,
+                            trControl = cont_train_alt))
+
+    if(class(fit_1)[1]=="try-error"){
+
+      stop("Something went wrong in hyperparameter tunin of KNN... check data structure!")
+
+    }
+
+
+  }
 
   #check number of markers
   if(ncor_markers<5){
@@ -336,6 +355,24 @@ locus_cv<-function(geno_mat, #genotypic matrix
                       method = "rf",
                       tuneGrid = grid_tune,
                       trControl = cont_train)
+
+  if(class(fit_2)[1]=="try-error"){
+
+    warning("There appears to be something wrong with repeated CV approach in RF. Switching to leave one observation out...")
+    cont_train_alt<-caret::trainControl(method="LOOCV")
+    fit_2<-try(caret::train(Call ~ .,
+                            data = training[,-1],
+                            method = "knn",
+                            tuneGrid = grid_tune,
+                            trControl = cont_train_alt))
+
+    if(class(fit_2)[1]=="try-error"){
+
+      stop("Something went wrong in hyperparameter tuning of RF... check data structure!")
+
+    }
+
+  }
 
   #send message
   if(verbose==TRUE){base::print("Note: Done!")}
