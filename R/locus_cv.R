@@ -51,6 +51,7 @@
 #' @importFrom lattice qq
 #' @importFrom ggplot2 ggplot
 #' @importFrom caret train
+#' @importFrom caret knn3
 #' @importFrom foreach %dopar%
 
 locus_cv<-function(geno_mat, #genotypic matrix
