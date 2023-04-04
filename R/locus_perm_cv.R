@@ -217,7 +217,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(is.na(results[[i]]$confusion_matrices$knn)){
+        if(unique(is.na(results[[i]]$confusion_matrices$knn))==TRUE){
 
           b=c
           b$Model="K-Nearest Neighbors"
@@ -274,7 +274,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         base::rownames(c)=NULL
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(is.na(base::as.data.frame(results[[i]]$confusion_matrices$knn))){
+        if(unique(is.na(base::as.data.frame(results[[i]]$confusion_matrices$knn)))==TRUE){
 
           b<-c
           b$Model="K-Nearest Neighbors"
@@ -374,7 +374,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(is.na(results[[i]]$confusion_matrices$knn)){
+        if(unique(is.na(results[[i]]$confusion_matrices$knn$overall))==TRUE){
           b<-c
           b$Model="K-Nearest Neighbors"
           b[,1:7]=NA
@@ -423,7 +423,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(is.na(results[[i]]$confusion_matrices$knn)){
+        if(unique(is.na(results[[i]]$confusion_matrices$knn))==TRUE){
 
           b=c
           b$Model="K-Nearest Neighbors"
