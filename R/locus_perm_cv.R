@@ -198,7 +198,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       #remove
       remove(a)
 
-    }
+      }
 
     }
 
@@ -374,7 +374,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(unique(is.na(results[[i]]$confusion_matrices$knn$overall))==TRUE){
+        if(unique(is.na(results[[i]]$confusion_matrices$knn))==TRUE){
           b<-c
           b$Model="K-Nearest Neighbors"
           b[,1:7]=NA
