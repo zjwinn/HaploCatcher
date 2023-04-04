@@ -274,7 +274,7 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
         base::rownames(c)=NULL
         c$Permutation=base::gsub("Permutation_", "", i)
 
-        if(unique(is.na(base::as.data.frame(results[[i]]$confusion_matrices$knn)))==TRUE){
+        if(unique(is.na(results[[i]]$confusion_matrices$knn))==TRUE){
 
           b<-c
           b$Model="K-Nearest Neighbors"
