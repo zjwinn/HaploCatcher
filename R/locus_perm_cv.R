@@ -327,14 +327,20 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
 
       remove(a,b,c,d)
 
+      check<-return_results$By_Class_Parameters
+
+      for(i in 1:ncol(check)){
+        check[,i]<-ifelse(is.na(check[,i]), 0, check[,i])
+      }
+
       #summarize
-      a<-stats::aggregate(. ~ Model+Class, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::mean)
+      a<-stats::aggregate(. ~ Model+Class, data=check[,2:base::ncol(check)], base::mean)
       base::colnames(a)[3:base::ncol(a)]=base::paste("Mean_", base::colnames(a)[3:base::ncol(a)], sep = "")
-      b<-stats::aggregate(. ~ Model+Class, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::min)
+      b<-stats::aggregate(. ~ Model+Class, data=check[,2:base::ncol(check)], base::min)
       base::colnames(b)[3:base::ncol(b)]=base::paste("Min_", base::colnames(b)[3:base::ncol(b)], sep = "")
-      c<-stats::aggregate(. ~ Model+Class, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::max)
+      c<-stats::aggregate(. ~ Model+Class, data=check[,2:base::ncol(check)], base::max)
       base::colnames(c)[3:base::ncol(c)]=base::paste("Max_", base::colnames(c)[3:base::ncol(c)], sep = "")
-      d<-stats::aggregate(. ~ Model+Class, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], stats::sd)
+      d<-stats::aggregate(. ~ Model+Class, data=check[,2:base::ncol(check)], stats::sd)
       base::colnames(d)[3:base::ncol(d)]=base::paste("SD_", base::colnames(d)[3:base::ncol(d)], sep = "")
       a<-base::cbind(a, b[,3:base::ncol(b)],c[,3:base::ncol(c)],d[,3:base::ncol(d)])
       a<-a[,c("Model",
@@ -476,13 +482,19 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       remove(a,b,c,d)
 
       #summarize
-      a<-stats::aggregate(. ~ Model, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::mean)
+      check<-return_results$By_Class_Parameters
+
+      for(i in 1:ncol(check)){
+        check[,i]<-ifelse(is.na(check[,i]), 0, check[,i])
+      }
+
+      a<-stats::aggregate(. ~ Model, data=check[,2:base::ncol(check)], base::mean)
       base::colnames(a)[2:base::ncol(a)]=base::paste("Mean_", base::colnames(a)[2:base::ncol(a)], sep = "")
-      b<-stats::aggregate(. ~ Model, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::min)
+      b<-stats::aggregate(. ~ Model, data=check[,2:base::ncol(check)], base::min)
       base::colnames(b)[2:base::ncol(b)]=base::paste("Min_", base::colnames(b)[2:base::ncol(b)], sep = "")
-      c<-stats::aggregate(. ~ Model, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], base::max)
+      c<-stats::aggregate(. ~ Model, data=check[,2:base::ncol(check)], base::max)
       base::colnames(c)[2:base::ncol(c)]=base::paste("Max_", base::colnames(c)[2:base::ncol(c)], sep = "")
-      d<-stats::aggregate(. ~ Model, data=return_results$By_Class_Parameters[,2:base::ncol(return_results$By_Class_Parameters)], stats::sd)
+      d<-stats::aggregate(. ~ Model, data=check[,2:base::ncol(check)], stats::sd)
       base::colnames(d)[2:base::ncol(d)]=base::paste("SD_", base::colnames(d)[2:base::ncol(d)], sep = "")
       a<-base::cbind(a, b[,2:base::ncol(b)],c[,2:base::ncol(c)],d[,2:base::ncol(d)])
       a<-a[,c("Model",
