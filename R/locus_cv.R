@@ -355,11 +355,11 @@ locus_cv<-function(geno_mat, #genotypic matrix
     }
 
   #fit model
-  fit_2<-caret::train(Call ~ .,
-                      data = training[,-1],
-                      method = "rf",
-                      tuneGrid = grid_tune,
-                      trControl = cont_train)
+  fit_2<-try(caret::train(Call ~ .,
+                          data = training[,-1],
+                          method = "rf",
+                          tuneGrid = grid_tune,
+                          trControl = cont_train))
 
   if(class(fit_2)[1]=="try-error"){
 
@@ -530,15 +530,15 @@ locus_cv<-function(geno_mat, #genotypic matrix
   pred_1<-base::data.frame(FullSampleName=test[,1],
                            Model = "K-Nearest Neighbors",
                            Gene=gene_name,
-                           Observed_Call=test[,2],
-                           Predicted_Call=pred_1)
+                           Observed_Call=factor(test[,2], levels = unique(classification$Call)),
+                           Predicted_Call=factor(pred_1, levels = unique(classification$Call)))
 
   pred_2<-stats::predict(fit_2, test[,-1])
   pred_2<-base::data.frame(FullSampleName=test[,1],
                            Model = "Random Forest",
                            Gene=gene_name,
-                           Observed_Call=test[,2],
-                           Predicted_Call=pred_2)
+                           Observed_Call=factor(test[,2], levels = unique(classification$Call)),
+                           Predicted_Call=factor(pred_2, levels = unique(classification$Call)))
 
   #calculate confusion matraix
   confu_1<-caret::confusionMatrix(pred_1$Observed_Call,
