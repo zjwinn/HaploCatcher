@@ -213,12 +213,25 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       #pull summaries
       for(i in base::names(results)){
 
-        b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$overall))
-        b$Model="K-Nearest Neighbors"
-        b$Permutation=base::gsub("Permutation_", "", i)
         c<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$rf$overall))
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
+
+        if(is.na(results[[i]]$confusion_matrices$knn)){
+
+          b=c
+          b$Model="K-Nearest Neighbors"
+          b[,1:7]=NA
+
+        }else{
+
+          b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$overall))
+          b$Model="K-Nearest Neighbors"
+          b$Permutation=base::gsub("Permutation_", "", i)
+
+        }
+
+
         a<-rbind(a,b,c)
         remove(b,c)
 
@@ -254,17 +267,29 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       #pull summaries for by class
       for(i in base::names(results)){
 
-        b<-base::as.data.frame(results[[i]]$confusion_matrices$knn$byClass)
-        b$Model="K-Nearest Neighbors"
-        b$Class=base::gsub("Class: ", "", base::rownames(b))
-        b$Permutation=base::gsub("Permutation_", "", i)
-        base::rownames(b)=NULL
         c<-base::as.data.frame(results[[i]]$confusion_matrices$rf$byClass)
         c$Model="Random Forest"
         c$Class=base::gsub("Class: ", "", base::rownames(c))
         c$Permutation=base::gsub("Permutation_", "", i)
         base::rownames(c)=NULL
         c$Permutation=base::gsub("Permutation_", "", i)
+
+        if(is.na(base::as.data.frame(results[[i]]$confusion_matrices$knn))){
+
+          b<-c
+          b$Model="K-Nearest Neighbors"
+          b[,1:11]=NA
+
+        }else{
+
+          b<-base::as.data.frame(results[[i]]$confusion_matrices$knn$byClass)
+          b$Model="K-Nearest Neighbors"
+          b$Class=base::gsub("Class: ", "", base::rownames(b))
+          b$Permutation=base::gsub("Permutation_", "", i)
+          base::rownames(b)=NULL
+
+        }
+
         a<-rbind(a,b,c)
         remove(b,c)
 
@@ -345,12 +370,20 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       #pull summaries for overall
       for(i in base::names(results)){
 
-        b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$overall))
-        b$Model="K-Nearest Neighbors"
-        b$Permutation=base::gsub("Permutation_", "", i)
         c<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$rf$overall))
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
+
+        if(is.na(results[[i]]$confusion_matrices$knn)){
+          b<-c
+          b$Model="K-Nearest Neighbors"
+          b[,1:7]=NA
+        }else{
+          b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$overall))
+          b$Model="K-Nearest Neighbors"
+          b$Permutation=base::gsub("Permutation_", "", i)
+        }
+
         a<-rbind(a,b,c)
         remove(b,c)
 
@@ -386,12 +419,25 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
       #pull summaries for by class
       for(i in base::names(results)){
 
-        b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$byClass))
-        b$Model="K-Nearest Neighbors"
-        b$Permutation=base::gsub("Permutation_", "", i)
         c<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$rf$byClass))
         c$Model="Random Forest"
         c$Permutation=base::gsub("Permutation_", "", i)
+
+        if(is.na(results[[i]]$confusion_matrices$knn)){
+
+          b=c
+          b$Model="K-Nearest Neighbors"
+          b[,1:11]=NA
+
+        }else{
+
+          b<-base::as.data.frame(base::t(results[[i]]$confusion_matrices$knn$byClass))
+          b$Model="K-Nearest Neighbors"
+          b$Permutation=base::gsub("Permutation_", "", i)
+
+        }
+
+
         a<-rbind(a,b,c)
         remove(b,c)
 
@@ -468,6 +514,14 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
 
     #put the raw results in the object
     return_results[["Raw_Permutation_Info"]]<-results
+
+    #check
+    if(length(unique(return_results$Overall_Summary$Model))==1 &
+       unique(return_results$Overall_Summary$Model)=="Random Forest"){
+
+      warning("It appears that too many ties were identified in the K-Nearest Neighbors predictions... Check your results object for NAs!")
+
+    }
 
     #return the results
     return(return_results)
