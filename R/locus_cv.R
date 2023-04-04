@@ -353,12 +353,143 @@ locus_cv<-function(geno_mat, #genotypic matrix
   if(verbose==TRUE){base::print("Note: Producing predictions and calculating confusion matricies on the test population")}
 
   #predict
-  pred_1<-stats::predict(fit_1, test[,-1])
+  pred_1<-try(stats::predict(fit_1, test[,-1]))
+
+
+  #catch if the predictions for KNN have too many ties
+  if(class(pred_1)=="try-error"){
+
+    #submit warning
+    warning("There were too many ties generated in the K-Nearest Neighbors predictions. Producing NAs for results...")
+
+    pred_1<-base::data.frame(FullSampleName=test[,1],
+                             Model = "K-Nearest Neighbors",
+                             Gene=gene_name,
+                             Observed_Call=test[,2],
+                             Predicted_Call=NA)
+
+    pred_2<-stats::predict(fit_2, test[,-1])
+    pred_2<-base::data.frame(FullSampleName=test[,1],
+                             Model = "Random Forest",
+                             Gene=gene_name,
+                             Observed_Call=test[,2],
+                             Predicted_Call=pred_2)
+
+    confu_1<-NA
+    confu_2<-caret::confusionMatrix(pred_2$Observed_Call,
+                                    pred_2$Predicted_Call)
+    if(verbose==TRUE){
+
+      base::print("There were too many ties for the K-Nearest Neighbors predictions. No results reported!")
+      base::print(knitr::kable(confu_2$table, caption = "Confusion matrix of Random Forest predictions"))
+
+    }
+
+    #show results of models
+    a<-base::data.frame(Parameters=names(confu_2$overall),
+                        `K-Nearest Neighbors`=NA,
+                        `Random Forest`=confu_2$overall,
+                        check.names = FALSE,
+                        row.names = NULL)
+    a$Parameters=c("Accuracy",
+                   "Kappa",
+                   "Accuracy_Lower_CI",
+                   "Accuracy_Upper_CI",
+                   "Accuracy_Null",
+                   "Accuracy_P_Value",
+                   "Mcnemar_P_Value")
+
+    if(verbose==TRUE){
+
+      base::print(knitr::kable(a, caption = "Overall Accuracy Parameters", digits = 3))
+
+    }
+
+    #show results of models
+    if(include_hets==FALSE){
+
+      a<-base::data.frame(Parameters=names(confu_2$byClass),
+                          `K-Nearest Neighbors`=NA,
+                          `Random Forest`=confu_2$byClass,
+                          check.names = FALSE,
+                          row.names = NULL)
+      a<-a[c(1,2,5,6,11),]
+      a$Parameters[5]="Balanced_Accuracy"
+      base::rownames(a)=NULL
+
+      if(verbose==TRUE){
+
+        base::print(knitr::kable(a, caption = "By-Class Accuracy Parameters", digits = 3))
+
+      }
+
+    }
+
+    if(include_hets==TRUE){
+
+      a<-base::as.data.frame(base::rbind(confu_2$byClass, confu_2$byClass))
+      a$Model=c(base::rep("K-Nearest Neighbors", 3), base::rep("Random Forest",3))
+      a$Class=base::rownames(a)
+      a$Class=base::gsub("Class..", "", a$Class)
+      a$Class=base::gsub("[.1]", "", a$Class)
+      a<-a[,c("Model",
+              "Class",
+              "Sensitivity",
+              "Specificity",
+              "Precision",
+              "Recall",
+              "Balanced Accuracy")]
+      a[1:3,2:ncol(a)]=NA
+      base::colnames(a)[7]="Balanced_Accuracy"
+      rownames(a)=NULL
+
+      if(verbose==TRUE){
+
+        base::print(knitr::kable(a, caption = "By-Class Accuracy Parameters", digits = 3))
+
+      }
+
+    }
+
+    #make results object
+    confu<-base::list(knn=NA,
+                      rf=confu_2)
+    preds<-base::list(knn=NA,
+                      rf=pred_2)
+    models<-base::list(knn=NA,
+                       rf=fit_2)
+    data<-base::list(training=training,
+                     test=test)
+
+    if(include_models==TRUE){
+
+      if(verbose==TRUE){base::print("Note: User has request that models remain in the results object")}
+      results<-base::list(data_frames=data,
+                          trained_models=models,
+                          test_predictions=preds,
+                          confusion_matrices=confu)
+
+    }else if(include_models==FALSE){
+
+      if(verbose==TRUE){base::print("Note: User has request that models are omitted from the results object")}
+      results<-base::list(data_frames=data,
+                          test_predictions=preds,
+                          confusion_matrices=confu)
+
+    }
+
+    #retrun the results
+    return(results)
+
+  }
+
+  #otherwise proceed as normally
   pred_1<-base::data.frame(FullSampleName=test[,1],
                            Model = "K-Nearest Neighbors",
                            Gene=gene_name,
                            Observed_Call=test[,2],
-                           Predicted_Call=pred_1)
+                           Predicted_Call=ifelse(class(pred_1)=="try-error", NA, pred_1))
+
   pred_2<-stats::predict(fit_2, test[,-1])
   pred_2<-base::data.frame(FullSampleName=test[,1],
                            Model = "Random Forest",
