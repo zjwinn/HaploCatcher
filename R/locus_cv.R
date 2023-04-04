@@ -355,7 +355,6 @@ locus_cv<-function(geno_mat, #genotypic matrix
   #predict
   pred_1<-try(stats::predict(fit_1, test[,-1]))
 
-
   #catch if the predictions for KNN have too many ties
   if(class(pred_1)=="try-error"){
 
@@ -484,11 +483,13 @@ locus_cv<-function(geno_mat, #genotypic matrix
   }
 
   #otherwise proceed as normally
+  #predict
+  pred_1<-stats::predict(fit_1, test[,-1])
   pred_1<-base::data.frame(FullSampleName=test[,1],
                            Model = "K-Nearest Neighbors",
                            Gene=gene_name,
                            Observed_Call=test[,2],
-                           Predicted_Call=ifelse(class(pred_1)=="try-error", NA, pred_1))
+                           Predicted_Call=pred_1)
 
   pred_2<-stats::predict(fit_2, test[,-1])
   pred_2<-base::data.frame(FullSampleName=test[,1],
