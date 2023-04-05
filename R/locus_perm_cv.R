@@ -530,7 +530,10 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
     #check
     if(length(unique(return_results$Overall_Summary$Model))==1){
 
-      warning("It appears that too many ties were identified in the K-Nearest Neighbors predictions... Check your results object for NAs!")
+      warning(paste("It appears that too many ties were identified in the K-Nearest Neighbors predictions of ",
+                    gene_name,
+                    "... Check your results object for NAs!",
+                    sep = ""))
 
     }
 
