@@ -105,7 +105,7 @@ auto_locus<-function(geno_mat, #the genotypic matrix
 
   #plot results
   if(plot_cv_results==TRUE){
-    HaploCatcher::plot_locus_perm_cv(fit_cv)
+    suppressWarnings(HaploCatcher::plot_locus_perm_cv(fit_cv))
   }
 
   #check the model selection parameter
@@ -120,8 +120,12 @@ auto_locus<-function(geno_mat, #the genotypic matrix
     #pull model
     model_selected<-fit_cv$Overall_Summary[fit_cv$Overall_Summary$Mean_Kappa==max(fit_cv$Overall_Summary$Mean_Kappa),"Model"]
 
-    #rename
-    if(model_selected=="Random Forest"){
+    if(length(model_selected)>1){
+      message("Note: There was a tie between models in terms of kappa, selecting model at random...")
+      model_selected=data.frame(a=c("knn", "rf"),
+                                rand=stats::rnorm(2, mean = 10000000, sd=30000))
+      model_selected=as.character(model_selected[model_selected$rand==max(model_selected$rand), 1])
+    }else if(model_selected=="Random Forest"){
       model_selected="rf"
     }else if(model_selected=="K-Nearest Neighbors"){
       model_selected="knn"
@@ -138,7 +142,12 @@ auto_locus<-function(geno_mat, #the genotypic matrix
     model_selected<-fit_cv$Overall_Summary[fit_cv$Overall_Summary$Mean_Accuracy==max(fit_cv$Overall_Summary$Mean_Accuracy),"Model"]
 
     #change name
-    if (model_selected=="Random Forest"){
+    if(length(model_selected)>1){
+      message("Note: There was a tie between models in terms of kappa, selecting model at random...")
+      model_selected=data.frame(a=c("knn", "rf"),
+                                rand=stats::rnorm(2, mean = 10000000, sd=30000))
+      model_selected=as.character(model_selected[model_selected$rand==max(model_selected$rand), 1])
+    }else if (model_selected=="Random Forest"){
       model_selected="rf"
     }else if(model_selected=="K-Nearest Neighbors"){
       model_selected="knn"
