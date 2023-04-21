@@ -115,7 +115,6 @@ locus_perm_cv<-function(n_perms=30, #number of permutations
     }
 
     #assign cluster
-
     cluster<-parallel::makeCluster(n_cores)
     doParallel::registerDoParallel(cluster)
 

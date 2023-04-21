@@ -107,7 +107,7 @@ locus_train<-function(geno_mat, #numeric genotypic matrix
 
     base::stop("Error: There are duplicated individuals in the 'gene_file'!")
 
-  }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))=="try-error"){
+  }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))[1]=="try-error"){
 
     base::stop("Error: The 'gene_file' does not have the columns 'Gene', 'FullSampleName', and 'Call'!")
 
@@ -133,7 +133,7 @@ locus_train<-function(geno_mat, #numeric genotypic matrix
   geno_matrix<-geno_mat[base::rownames(geno_mat) %in% classification$FullSampleName,]
 
   #check if
-  if(base::class(base::try(base::ncol(marker_info[,c("Marker", "Chromosome", "BP_Position")])))=="try-error"){
+  if(base::class(base::try(base::ncol(marker_info[,c("Marker", "Chromosome", "BP_Position")])))[1]=="try-error"){
 
     base::stop("Error: columns are misnamed or missing in the 'marker_info'!")
 

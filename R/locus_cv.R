@@ -83,7 +83,7 @@ locus_cv<-function(geno_mat, #genotypic matrix
 
     base::stop("There are duplicated individuals in the 'gene_file' or there are missing FullSampleNames in the 'gene_file'!")
 
-  }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))=="try-error"){
+  }else if(base::class(base::try(base::ncol(gene_file[,c("Gene", "FullSampleName", "Call")])))[1]=="try-error"){
 
     base::stop("The 'gene_file' does not have the columns 'Gene', 'FullSampleName', and 'Call'!")
 
@@ -167,7 +167,7 @@ locus_cv<-function(geno_mat, #genotypic matrix
   geno_matrix<-geno_mat[base::rownames(geno_mat) %in% classification$FullSampleName,]
 
   #check if
-  if(base::class(base::try(base::ncol(marker_info[,c("Marker", "Chromosome", "BP_Position")])))=="try-error"){
+  if(base::class(base::try(base::ncol(marker_info[,c("Marker", "Chromosome", "BP_Position")])))[1]=="try-error"){
 
     base::stop("columns are misnamed or missing in the 'marker_info'!")
 
@@ -398,7 +398,7 @@ locus_cv<-function(geno_mat, #genotypic matrix
   pred_1<-try(stats::predict(fit_1, test[,-1]))
 
   #catch if the predictions for KNN have too many ties
-  if(class(pred_1)=="try-error"){
+  if(class(pred_1)[1]=="try-error"){
 
     #submit warning
     warning("There were too many ties generated in the K-Nearest Neighbors predictions. Producing NAs for results...")
