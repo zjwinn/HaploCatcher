@@ -190,6 +190,13 @@ locus_cv<-function(geno_mat, #genotypic matrix
 
   }
 
+  #check if
+  if(length(colnames(geno_matrix))!=nrow(selected_markers)){
+
+    stop("It appears that there are some markers in your `marker_info` file that do not exist in your genotypic matrix! Check to see if the files agree.")
+
+  }
+
   #pull training individuals
   geno_sub_training<-geno_matrix[base::rownames(geno_matrix) %in% training$FullSampleName,]
 
@@ -231,6 +238,13 @@ locus_cv<-function(geno_mat, #genotypic matrix
   #plot threshold
   corr<-corr[base::order(corr$`|r|`, decreasing = TRUE),]
   corr<-corr[1:ncor_markers,]
+
+  if(ncor_markers>ncol(training)){
+
+    stop("The number of markers set for comparison is larger than the provided genotypic matrix. Lower the parameter 'ncor_markers'.")
+
+  }
+
 
   #plot threshold line
   if(graph==TRUE){
