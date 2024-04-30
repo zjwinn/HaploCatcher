@@ -5,8 +5,13 @@ This is a public repository for the R package 'HaploCatcher'. This package utili
 
 # Installation
 To install HaploCatcher in R, users can use the following fucntion taken from the (devtools package)[https://www.rdocumentation.org/packages/devtools/versions/2.4.5] 
+```r
+# Install HaploCatcher
+devtools::install_github("zjwinn/HaploCatcher")
+```
+It is recommended to install using the above code to get the most up-to-date version of HaploCatcher. To install from (CRAN)[https://cran.rstudio.com/] instead, use the following code in R:
 
 ```r
-#install HaploCatcher
-devtools::install_github("zjwinn/HaploCatcher")
+# Install HaploCatcher from CRAN
+install.packages("HaploCatcher")
 ```
