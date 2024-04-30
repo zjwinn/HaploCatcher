@@ -16,7 +16,7 @@ install.packages("HaploCatcher")
 ```
 
 # Getting Started
-To understand all necesary inputs for HaploCatcher, users can follow the tutorial laid out in the following R vignette titled, "(An Intro to HaploCatcher)[https://cran.r-project.org/web//packages//HaploCatcher/vignettes/An_Intro_to_HaploCatcher.html]." To call on the vignette directly from the R terminal, use the following R code after installing HaploCatcher:
+To understand all necesary inputs for HaploCatcher, users can follow the tutorial laid out in the following R vignette titled, (An Intro to HaploCatcher)[https://cran.r-project.org/web//packages//HaploCatcher/vignettes/An_Intro_to_HaploCatcher.html]. To call on the vignette directly from the R terminal, use the following R code after installing HaploCatcher:
 ```r
 # Call vignette
 vignette("An_Intro_to_HaploCatcher")
