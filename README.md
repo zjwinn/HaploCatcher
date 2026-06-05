@@ -1,4 +1,8 @@
-# HaploCatcher <img src="https://raw.githubusercontent.com/zjwinn/HaploCatcher/main/man/figures/logo.png" title="HaploCatcher: A Predictive Haplotyping Package" align="right" width="190" />
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zjwinn/HaploCatcher/main/man/figures/logo.png" title="HaploCatcher: A Predictive Haplotyping Package" width="200" alt="HaploCatcher hex logo" />
+</p>
+
+# HaploCatcher
 
 *A Predictive Haplotyping Package*
 
