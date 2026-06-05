@@ -2,7 +2,7 @@
 % Please edit documentation in R/locus_train.R
 \name{locus_train}
 \alias{locus_train}
-\title{Haplotype Prediction: Training Models for Use in Forward Prediction}
+\title{Haplotype Prediction: Training Models for Forward Prediction}
 \usage{
 locus_train(
   geno_mat,
@@ -16,39 +16,46 @@ locus_train(
   verbose = FALSE,
   set_seed = NULL,
   models_request = "all",
-  graph = FALSE
+  graph = FALSE,
+  het_label = NULL
 )
 }
 \arguments{
-\item{geno_mat}{An imputed, number-coded, genotypic matrix which has n rows of individuals and m columns of markers. Row names of the matrix should be representative of genotypic IDs and column names should be representative of marker IDs. Missing data is not allowed. Numeric coding of genotypes can vary as long as it remains consistant among markers.}
+\item{geno_mat}{An imputed, number-coded genotypic matrix with n rows of individuals and m columns of markers. Row names are genotype IDs; column names are marker IDs. Missing data are not allowed. Numeric coding may vary as long as it is consistent across markers.}
 
-\item{gene_file}{A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.}
+\item{gene_file}{A data frame with at least the columns 'Gene', 'FullSampleName', and 'Call'. 'Gene' is the gene each observation belongs to, 'FullSampleName' matches a column name in the genotypic matrix, and 'Call' is the marker call for that genotype.}
 
-\item{gene_name}{A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.}
+\item{gene_name}{A character string matching a value in the 'Gene' column of \code{gene_file}.}
 
-\item{marker_info}{A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.}
+\item{marker_info}{A data frame with the columns 'Marker', 'Chromosome', and 'BP_Position'. Every marker in the genotypic matrix must be listed. If positions are unavailable a numeric dummy (1..m) may be used.}
 
-\item{chromosome}{A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.}
+\item{chromosome}{A character string matching a value in the 'Chromosome' column of \code{marker_info}.}
 
-\item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
+\item{ncor_markers}{Number of top correlated markers to retain for training. Default 50.}
 
-\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
+\item{n_neighbors}{Number of neighbors to consider in KNN. Default 50.}
 
-\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
+\item{include_hets}{Logical; keep heterozygous calls. Default FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants text feedback. Default setting is TRUE.}
+\item{verbose}{Logical; print progress and tables. Default FALSE.}
 
-\item{set_seed}{A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, use the function "locus_voting" instead. The default setting is NULL.}
+\item{set_seed}{Numeric seed for reproducibility, or NULL. Default NULL.}
 
-\item{models_request}{A character string which defines what models are to be ran. K-nearest neighbors is abbreviated as "knn" and random forest is "rf". If both models are desired, use the text string "all". Default setting is "all".}
+\item{models_request}{Which models to train: "knn", "rf", or "all". Default "all".}
 
-\item{graph}{A logical variable which determines if the user wants graphs displayed. default setting is FALSE.}
+\item{graph}{Logical; draw the marker-correlation diagnostic. Default FALSE.}
+
+\item{het_label}{Optional character vector of \code{Call} values to treat as heterozygous. When NULL (default), calls containing the prefix "het_" are used.}
 }
 \value{
-This function returns a list of list which contains: "seed", "models_request" ,"models", and "data". The "seed" object is the seed set by the user. If no seed was provided this will appear as a character stating "no_seed_set". The "models_request" item hold the models requested. The "models" object contains the trained models. The "data" object contains the data used to train the models.
+A list with \code{seed}, \code{models_request}, \code{trained_models}, and \code{data}
+(the training frame). \code{trained_models} is a single caret model when one
+model was requested, or a list with \code{knn} and \code{rf} when "all".
 }
 \description{
-This function is used to train a model for use in forward prediction of lines which have no record
+Trains KNN and/or RF models on the full training data for use in forward
+prediction of lines that have no locus record. Shares all data preparation
+and model-fitting logic with \code{\link[=locus_cv]{locus_cv()}}.
 }
 \examples{
 
@@ -89,7 +96,7 @@ fit<-locus_train(geno_mat=geno_mat, #the genotypic matrix
                  include_hets=FALSE, #include hets in the model
                  verbose = FALSE, #allows for text and graph output
                  set_seed = 022294, #sets a seed for reproduction of results
-                 models = "knn") #sets what models are requested
+                 models_request = "knn") #sets what models are requested
 
 #predict the lines in the test population
 pred<-locus_pred(locus_train_results=fit,

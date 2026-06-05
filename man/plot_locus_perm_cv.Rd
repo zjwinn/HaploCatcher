@@ -4,18 +4,30 @@
 \alias{plot_locus_perm_cv}
 \title{Visualize Permutation CV Results}
 \usage{
-plot_locus_perm_cv(results, individual_images = FALSE)
+plot_locus_perm_cv(
+  results,
+  individual_images = FALSE,
+  het_label = NULL,
+  neg_label = NULL
+)
 }
 \arguments{
-\item{results}{An object of class "list" which is derived from the "locus_perm_cv" function.}
+\item{results}{A list produced by \code{\link[=locus_perm_cv]{locus_perm_cv()}}.}
 
-\item{individual_images}{A logical argument that defines if the user wants both the composite image and the full image. Default setting is FALSE.}
+\item{individual_images}{Logical; also print each panel on its own. Default FALSE.}
+
+\item{het_label}{Optional character vector of class labels to treat as heterozygous when relabeling facets. When NULL (default), the "het_" prefix is used.}
+
+\item{neg_label}{Optional character vector of class labels to treat as the negative/wild-type case when relabeling facets. When NULL (default), the "non_" prefix is used.}
 }
 \value{
-Prints a ggplot2 image
+Invisibly returns NULL; called for its plotting side effect.
 }
 \description{
-This function takes a list of list object from the "locus_perm_cv" function and creates a summary graphic of the accuracy, kappa, sensitivity, and specificity of the models ran. If heterozygous individuals were left in the cross validation scheme, by-class sensitivity and specificity will be displayed; otherwise, displayed parameters will be of the overall model.
+Takes the result of \code{\link[=locus_perm_cv]{locus_perm_cv()}} and draws a composite of accuracy,
+kappa, sensitivity, and specificity across permutations. When more than one
+call class is present (heterozygotes retained), sensitivity and specificity
+are faceted by class.
 }
 \examples{
 

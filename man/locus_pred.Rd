@@ -7,17 +7,19 @@
 locus_pred(locus_train_results, geno_mat, genotypes_to_predict)
 }
 \arguments{
-\item{locus_train_results}{This object is a the results object from the "locus_train" function.}
+\item{locus_train_results}{The list returned by \code{\link[=locus_train]{locus_train()}}.}
 
-\item{geno_mat}{This is a genotypic matrix with genotypes of individuals you have genotyped and characterized for the locus/QTL/gene of interest and individuals that have only been genotyped with a genome wide marker panel. It is important to note that the markers in the genome wide panel \emph{must} be shared between training population and the population you wish to forward predict. In the case of genotyping-by-sequencing markers, the training and test populations should be discovered and produced together into a genotype file. All marker platforms, however, are compatable, as long as the training and forward prediction population share the same markers genome-wide.}
+\item{geno_mat}{A genotypic matrix containing the genotypes to predict. The genome-wide markers must be shared with the training population.}
 
-\item{genotypes_to_predict}{This is a character vector of genotypes in the geno_mat which the user wishes to predict. If this object contains names in the training population, they will be omitted in the results to avoid bias.}
+\item{genotypes_to_predict}{A character vector of genotype names (rows of \code{geno_mat}) to predict. Names that were in the training data are dropped to avoid bias.}
 }
 \value{
-a data frame with two columns: genotype names and predictions.
+A data frame with \code{FullSampleName} and one prediction column per
+trained model (\code{Prediction_KNN} and/or \code{Prediction_RF}).
 }
 \description{
-Haplotype Prediction: Using Trained Models to Make Predictions
+Applies the models from \code{\link[=locus_train]{locus_train()}} to forward-predict the haplotype of
+genotypes that have genome-wide marker data but no locus record.
 }
 \examples{
 
@@ -58,7 +60,7 @@ fit<-locus_train(geno_mat=geno_mat, #the genotypic matrix
                  include_hets=FALSE, #include hets in the model
                  verbose = FALSE, #allows for text and graph output
                  set_seed = 022294, #sets a seed for reproduction of results
-                 models = "knn") #sets what models are requested
+                 models_request = "knn") #sets what models are requested
 
 #predict the lines in the test population
 pred<-locus_pred(locus_train_results=fit,

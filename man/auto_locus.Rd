@@ -2,7 +2,7 @@
 % Please edit documentation in R/auto_locus.R
 \name{auto_locus}
 \alias{auto_locus}
-\title{Auto Locus - An Automated Pipeline for Locus Prediction}
+\title{Auto Locus: An Automated Pipeline for Locus Prediction}
 \usage{
 auto_locus(
   geno_mat,
@@ -26,59 +26,71 @@ auto_locus(
   verbose = TRUE,
   parallel = FALSE,
   n_cores = NULL,
-  plot_cv_results = TRUE
+  plot_cv_results = TRUE,
+  het_label = NULL,
+  neg_label = NULL
 )
 }
 \arguments{
-\item{geno_mat}{An imputed, number-coded, genotypic matrix which has n rows of individuals and m columns of markers. Row names of the matrix should be representative of genotypic IDs and column names should be representative of marker IDs. Missing data is not allowed. Numeric coding of genotypes can vary as long as it remains consistant among markers.}
+\item{geno_mat}{An imputed, number-coded genotypic matrix with n rows of individuals and m columns of markers. Row names are genotype IDs; column names are marker IDs. Missing data are not allowed. Numeric coding may vary as long as it is consistent across markers.}
 
-\item{gene_file}{A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.}
+\item{gene_file}{A data frame with at least the columns 'Gene', 'FullSampleName', and 'Call'. 'Gene' is the gene each observation belongs to, 'FullSampleName' matches a column name in the genotypic matrix, and 'Call' is the marker call for that genotype.}
 
-\item{gene_name}{A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.}
+\item{gene_name}{A character string matching a value in the 'Gene' column of \code{gene_file}.}
 
-\item{marker_info}{A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.}
+\item{marker_info}{A data frame with the columns 'Marker', 'Chromosome', and 'BP_Position'. Every marker in the genotypic matrix must be listed. If positions are unavailable a numeric dummy (1..m) may be used.}
 
-\item{chromosome}{A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.}
+\item{chromosome}{A character string matching a value in the 'Chromosome' column of \code{marker_info}.}
 
-\item{training_genotypes}{A character vector of fullsamplenames found in the geno_mat and gene_file. These are lines which will be used in cross validation and to train the model which will predict the lines which have no locus call available.}
+\item{training_genotypes}{Character vector of FullSampleNames used for cross-validation and to train the prediction model.}
 
-\item{testing_genotypes}{A character vector of fullsamplenames found in the geno_mat. These are lines which will have predictions made for them.}
+\item{testing_genotypes}{Character vector of FullSampleNames to predict.}
 
-\item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
+\item{ncor_markers}{Number of top correlated markers to retain for training. Default 50.}
 
-\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
+\item{n_neighbors}{Number of neighbors to consider in KNN. Default 50.}
 
-\item{cv_percent_testing}{A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.}
+\item{cv_percent_testing}{Proportion reserved for validation during CV, strictly between 0 and 1. Default 0.20.}
 
-\item{cv_percent_training}{A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.}
+\item{cv_percent_training}{Proportion used for training during CV, strictly between 0 and 1. Default 0.80.}
 
-\item{n_perms}{A numeric variable defining the number of permutations to perform. This value may range from one to infinity. Default is 30.}
+\item{n_perms}{Number of cross-validation permutations. Default 30.}
 
-\item{model_selection_parameter}{A character string which defines which model performance parameter the user wants to use to select the best performing model. Only two strings are accepted either "kappa" for selection on Cohen's kappa value or "accuracy" for selection on total accuracy. Default is "kappa".}
+\item{model_selection_parameter}{Metric for selecting the best model: "kappa" or "accuracy". Default "kappa".}
 
-\item{n_votes}{A numeric variable defining the number of models to train and predict with. This method will take n number of predictions over multiple iterations, sum across those multiple iterations and provide a prediction which is based on majority rule. The default is 30.}
+\item{n_votes}{Number of models to train and predict with when voting. Default 30.}
 
-\item{set_seed}{A numeric variable that is used to set a seed for reproducible results if the user is running the "locus_trait" function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, set 'predict_by_vote' to TRUE instead. The default setting is NULL.}
+\item{set_seed}{Numeric seed for a single reproducible prediction (required when \code{predict_by_vote = FALSE}). Default NULL.}
 
-\item{predict_by_vote}{A logical variable which defines if the user wants predictions generated by voting over several runs of machine models summarized into a majority rule call. Default is FALSE.}
+\item{predict_by_vote}{Logical; predict by majority rule over many random models. Default FALSE.}
 
-\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. The default setting is FALSE.}
+\item{include_hets}{Logical; keep heterozygous calls. Default FALSE.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. The default setting is FALSE.}
+\item{include_models}{Logical; keep the trained models in the CV result (large). Default FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants plots displayed and text feedback from each permutation. Regardless of this parameter, the function will display the name of the gene which is being cross validated and the current progress of the permutations. Default setting is TRUE.}
+\item{verbose}{Logical; print progress and plots. Default TRUE.}
 
-\item{parallel}{A logical variable which determines if the user wants the cross validation and voting predictions to be performed in parallel. Default is FALSE. If the user defines that parallel is TRUE, all visual and textual feedback will not be rendered.}
+\item{parallel}{Logical; run CV and voting in parallel. Default FALSE.}
 
-\item{n_cores}{A numeric variable that is used to set a seed for reproducible results if the user is running the function once for use in the "locus_pred" function. If the user wishes to run the function many times with a random seed and decide the outcome by voting, set 'predict_by_vote' to true instead. The default setting is NULL.}
+\item{n_cores}{Number of cores for parallel processing. If NULL and \code{parallel = TRUE}, uses all available cores minus one.}
 
-\item{plot_cv_results}{A logical variable which determines if the user want the cross validation results to be printed as a 'ggplot' image. Default is TRUE}
+\item{plot_cv_results}{Logical; draw the cross-validation summary plot. Default TRUE.}
+
+\item{het_label}{Optional character vector of \code{Call} values to treat as heterozygous. When NULL (default), the package convention (calls containing "het_") is used.}
+
+\item{neg_label}{Optional character vector of \code{Call} values to treat as the negative/wild-type case (used only for plot facet labels). When NULL (default), the "non_" prefix is used.}
 }
 \value{
-This function returns two types of list-of-list objects. If 'predict_by_vote' is set to FALSE (the default setting), then the list will contain four objects: method, cross_validation_results, prediction_model, and predictions. The method object is a character which denotes what method was used. The cross_validation_results object contains the results of the cross-validation. The prediction model contains the information about the prediction model, and predictions contains the predictions for the testing_genotypes. If 'predict_by_vote' is set to TRUE, then the list will contain four objects: method, cross_validation_results, predictions, and consensus_predictions. Both method and cross_validation_results are the same for this option. Predictions contains the prediction of each model ran to vote. The object consensus_predictions contains a consensus prediction of the alleleic state of a genotype based on majority rule and a tablular summary of how many votes were taken per catigory.
+A list. When \code{predict_by_vote = FALSE}: \code{method},
+\code{cross_validation_results}, \code{prediction_model}, and \code{predictions}. When
+\code{predict_by_vote = TRUE}: \code{method}, \code{cross_validation_results},
+\code{predictions} (per-vote calls), and \code{consensus_predictions} (majority rule).
 }
 \description{
-This function takes all other functions of the HaploCatcher package and weaves them into one pipeline that performs locus prediction with minimal user intervention.
+Weaves the HaploCatcher functions into a single pipeline (Figure 1b of the
+package paper): permutation cross-validation, best-model selection by kappa
+or accuracy, then forward prediction either with one seeded model or by
+majority-rule voting over many random models.
 }
 \examples{
 

@@ -17,41 +17,49 @@ locus_cv(
   include_hets = FALSE,
   include_models = FALSE,
   verbose = TRUE,
-  graph = FALSE
+  graph = FALSE,
+  het_label = NULL
 )
 }
 \arguments{
-\item{geno_mat}{An imputed, number-coded, genotypic matrix which has n rows of individuals and m columns of markers. Row names of the matrix should be representative of genotypic IDs and column names should be representative of marker IDs. Missing data is not allowed. Numeric coding of genotypes can vary as long as it remains consistant among markers.}
+\item{geno_mat}{An imputed, number-coded genotypic matrix with n rows of individuals and m columns of markers. Row names are genotype IDs; column names are marker IDs. Missing data are not allowed. Numeric coding may vary as long as it is consistent across markers.}
 
-\item{gene_file}{A dataframe containing at least three columns labeled as follows: 'Gene', 'FullSampleName', and 'Call'. The 'Gene' column contains the name of the gene for which the observation belongs to. The 'FullSampleName' column contains the genotypic ID which corresponds exactly to the column name in the genotypic matrix. The 'Call' column contains the marker call which corresponds to the gene for that genotype. Other information may be present in this dataframe beyond these columns, but the three listed columns above are obligatory.}
+\item{gene_file}{A data frame with at least the columns 'Gene', 'FullSampleName', and 'Call'. 'Gene' is the gene each observation belongs to, 'FullSampleName' matches a column name in the genotypic matrix, and 'Call' is the marker call for that genotype.}
 
-\item{gene_name}{A character string which matches the name of the gene which you are trying to perform cross validation for. This character string must be present in your gene_file 'Gene' column.}
+\item{gene_name}{A character string matching a value in the 'Gene' column of \code{gene_file}.}
 
-\item{marker_info}{A dataframe containing the following three columns: 'Marker', 'Chromosome', and 'BP_Position'. The 'Marker' column contains the names of the marker which are present in the genotypic matrix. The 'Chromosome' column contains the corresponding chromosome/linkage group to which the marker belongs. The 'Position' column contains the physical or centimorgan position of the marker. All markers present in the genotypic matrix must be listed in this dataframe. If physical or centimorgan positions are unavailable for the listed markers, a numeric dummy variable ranging from one to n number of markers may be provided instead.}
+\item{marker_info}{A data frame with the columns 'Marker', 'Chromosome', and 'BP_Position'. Every marker in the genotypic matrix must be listed. If positions are unavailable a numeric dummy (1..m) may be used.}
 
-\item{chromosome}{A character string which matches the name of the chromosome upon which the gene resides. This chromosome name must be present in the marker_info file.}
+\item{chromosome}{A character string matching a value in the 'Chromosome' column of \code{marker_info}.}
 
-\item{ncor_markers}{A numeric variable which represents the number of markers the user want to use in model training. Correlation among markers to the gene call is calculated and the top n markers specified are retained for training. The default setting is 50 markers.}
+\item{ncor_markers}{Number of top correlated markers to retain for training. Default 50.}
 
-\item{n_neighbors}{A numeric variable which represents the number of neighbors to use in KNN. Default is 50.}
+\item{n_neighbors}{Number of neighbors to consider in KNN. Default 50.}
 
-\item{percent_testing}{A numeric variable which ranges such that x|0<x<1. This means that this number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain to validate the model. The default setting is 0.20.}
+\item{percent_testing}{Proportion of data reserved for validation, strictly between 0 and 1. Default 0.20.}
 
-\item{percent_training}{A numeric variable which ranges such that x|0<x<1. This means that the number can be neither zero nor one. This number represents the percent of the total data available the user wants to retain for training of the model.The default setting is 0.80.}
+\item{percent_training}{Proportion of data used for training, strictly between 0 and 1. Default 0.80.}
 
-\item{include_hets}{A logical variable which determines if the user wishes to include heterozygous calls or not. Default is FALSE.}
+\item{include_hets}{Logical; keep heterozygous calls. Default FALSE.}
 
-\item{include_models}{A logical variable which determines if the user wishes to include the trained models in the results object for further testing. Warning: the models are quite large and running this will result in a very large results object. Default is FALSE.}
+\item{include_models}{Logical; keep the trained models in the result (large). Default FALSE.}
 
-\item{verbose}{A logical variable which determines if the user wants text feedback. Default is TRUE.}
+\item{verbose}{Logical; print progress and tables. Default TRUE.}
 
-\item{graph}{A logical variable which determines if the user wants plots displayed. Default is FALSE.}
+\item{graph}{Logical; draw the marker-correlation diagnostic. Default FALSE.}
+
+\item{het_label}{Optional character vector of \code{Call} values to treat as heterozygous. When NULL (default), calls containing the prefix "het_" are used.}
 }
 \value{
-This function returns a list of list which contains the following list objects: 'confu', 'preds', 'models', and 'data'. The 'confu' list contains the confusion matrix objects for both the random forest and k-nearest neighbors models. The 'preds' list contains the predictions made by the separate models. The 'models' contains the two caret model objects for both the random forest and k-nearest neighbors models. The 'data' list contains the training and test data frames made by the function.
+A list with \code{data_frames} (training and test frames), \code{test_predictions}
+(per-model prediction frames), \code{confusion_matrices} (per-model confusion
+objects), and, when \code{include_models = TRUE}, \code{trained_models}.
 }
 \description{
-This function performs the analysis featured in Winn et al 2022 where genome wide markers are used to train machine learning models to identify if genotypes have or do not have specific alleles of a QTL/gene. This function is used to perform cross validation where a random partition of the total available data is used to train a model and a reserved testing partition is used to validate. This function is used for a single round of cross validation.
+Performs one round of the cross-validation featured in Winn et al. (2022):
+a random partition of the training data trains KNN and RF models, and a
+reserved test partition validates them. This is a single permutation; use
+\code{\link[=locus_perm_cv]{locus_perm_cv()}} to repeat it.
 }
 \examples{
 

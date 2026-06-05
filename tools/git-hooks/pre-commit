@@ -1,0 +1,26 @@
+#!/bin/sh
+# HaploCatcher pre-commit hook: keep HaploCatcher-source.R in sync with R/.
+#
+# Install once (from the repo root):
+#   git config core.hooksPath tools/git-hooks
+#
+# If R/ has changed but the single-file source was not regenerated, this blocks
+# the commit and tells you how to fix it. Contributors without Rscript on PATH
+# are not blocked (the hook simply skips the check for them).
+
+# locate Rscript; skip the check gracefully if it is unavailable
+if ! command -v Rscript >/dev/null 2>&1; then
+  echo "pre-commit: Rscript not found; skipping HaploCatcher-source.R sync check." >&2
+  exit 0
+fi
+
+# verify the single-file source matches a fresh build of R/
+if ! Rscript tools/build_single_source.R --check; then
+  echo "" >&2
+  echo "pre-commit: HaploCatcher-source.R is out of date with R/." >&2
+  echo "  Run:  Rscript tools/build_single_source.R" >&2
+  echo "  Then: git add HaploCatcher-source.R  and commit again." >&2
+  exit 1
+fi
+
+exit 0

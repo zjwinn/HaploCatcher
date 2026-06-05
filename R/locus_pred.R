@@ -1,10 +1,14 @@
 #' Haplotype Prediction: Using Trained Models to Make Predictions
 #'
-#' @param locus_train_results This object is a the results object from the "locus_train" function.
-#' @param geno_mat This is a genotypic matrix with genotypes of individuals you have genotyped and characterized for the locus/QTL/gene of interest and individuals that have only been genotyped with a genome wide marker panel. It is important to note that the markers in the genome wide panel *must* be shared between training population and the population you wish to forward predict. In the case of genotyping-by-sequencing markers, the training and test populations should be discovered and produced together into a genotype file. All marker platforms, however, are compatable, as long as the training and forward prediction population share the same markers genome-wide.
-#' @param genotypes_to_predict This is a character vector of genotypes in the geno_mat which the user wishes to predict. If this object contains names in the training population, they will be omitted in the results to avoid bias.
+#' Applies the models from [locus_train()] to forward-predict the haplotype of
+#' genotypes that have genome-wide marker data but no locus record.
 #'
-#' @return a data frame with two columns: genotype names and predictions.
+#' @param locus_train_results The list returned by [locus_train()].
+#' @param geno_mat A genotypic matrix containing the genotypes to predict. The genome-wide markers must be shared with the training population.
+#' @param genotypes_to_predict A character vector of genotype names (rows of `geno_mat`) to predict. Names that were in the training data are dropped to avoid bias.
+#'
+#' @return A data frame with `FullSampleName` and one prediction column per
+#'   trained model (`Prediction_KNN` and/or `Prediction_RF`).
 #'
 #' @export
 #'
@@ -47,7 +51,7 @@
 #'                  include_hets=FALSE, #include hets in the model
 #'                  verbose = FALSE, #allows for text and graph output
 #'                  set_seed = 022294, #sets a seed for reproduction of results
-#'                  models = "knn") #sets what models are requested
+#'                  models_request = "knn") #sets what models are requested
 #'
 #' #predict the lines in the test population
 #' pred<-locus_pred(locus_train_results=fit,
@@ -58,90 +62,37 @@
 #' head(pred)
 #'
 #' @importFrom randomForest randomForest
-#' @importFrom lattice qq
-#' @importFrom ggplot2 ggplot
-#' @importFrom caret train
-#' @importFrom caret knn3
-#' @importFrom foreach %dopar%
+#' @importFrom caret train knn3
 
-locus_pred<-function(locus_train_results,
-                     geno_mat,
-                     genotypes_to_predict){
+locus_pred <- function(locus_train_results, geno_mat, genotypes_to_predict) {
 
-  a<-locus_train_results
-  b<-geno_mat
-  c<-genotypes_to_predict
+  # the model request tells us which models the training object holds
+  req <- locus_train_results$models_request
+  # guard against a malformed training object
+  if (is.null(req) || !req %in% c("knn", "rf", "all"))
+    stop("'locus_train_results' is malformed; was it produced by locus_train()?", call. = FALSE)
 
-  if(a$models_request=="all"){
+  # the markers used in training are columns 3..n of the stored training frame
+  marker_cols <- colnames(locus_train_results$data)[-(1:2)]
+  # subset the genotype matrix to the requested individuals and training markers
+  x <- geno_mat[rownames(geno_mat) %in% genotypes_to_predict,
+                colnames(geno_mat) %in% marker_cols, drop = FALSE]
+  # nothing to predict if no requested individuals are present
+  if (nrow(x) == 0L)
+    stop("None of 'genotypes_to_predict' were found in 'geno_mat'!", call. = FALSE)
 
-    #pull models
-    knn<-a$trained_models$knn
-    rf<-a$trained_models$rf
-
-    #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
-
-    #predict
-    pred_1=stats::predict(knn, b)
-    pred_2=stats::predict(rf, b)
-
-    #make a prediction object
-    pred<-base::data.frame(FullSampleName=rownames(b),
-                           Prediction_KNN=pred_1,
-                           Prediction_RF=pred_2)
-
-    #make results
-    results<-pred
-
-    #return
-    return(results)
-
-  }else if(a$models_request=="knn"){
-
-    #pull models
-    knn<-a$trained_models
-
-    #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
-
-    #predict
-    pred_1=stats::predict(knn, b)
-
-    #make a prediction object
-    pred<-base::data.frame(FullSampleName=rownames(b),
-                           Prediction_KNN=pred_1)
-
-    #make results
-    results<-pred
-
-    #return
-    return(results)
-
-  }else if(a$models_request=="rf"){
-
-    #pull models
-    rf<-a$trained_models
-
-    #subset to only have the indiviudals who you want to predict
-    b<-b[base::rownames(b) %in% c, base::colnames(b) %in% base::colnames(a$data)[3:base::ncol(a$data)]]
-
-    #predict
-    pred_2=stats::predict(rf, b)
-
-    #make a prediction object
-    pred<-base::data.frame(FullSampleName=rownames(b),
-                           Prediction_RF=pred_2)
-
-    #make results
-    results<-pred
-
-    #return
-    return(results)
-
-  }else{
-
-    base::stop("Error: Is the 'geno_train_results' correct? Check your inputs!")
-
+  # start the prediction frame with the individual names
+  out <- data.frame(FullSampleName = rownames(x), stringsAsFactors = FALSE)
+  # pull KNN predictions when a KNN model is available
+  if (req %in% c("all", "knn")) {
+    knn <- if (req == "all") locus_train_results$trained_models$knn else locus_train_results$trained_models
+    out$Prediction_KNN <- stats::predict(knn, x)
   }
-
+  # pull RF predictions when an RF model is available
+  if (req %in% c("all", "rf")) {
+    rf <- if (req == "all") locus_train_results$trained_models$rf else locus_train_results$trained_models
+    out$Prediction_RF <- stats::predict(rf, x)
+  }
+  # return the prediction frame
+  out
 }
