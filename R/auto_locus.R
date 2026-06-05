@@ -105,21 +105,20 @@ auto_locus <- function(geno_mat, gene_file, gene_name, marker_info, chromosome,
 
   # ---- Step IIA: single seeded model ----
   if (!predict_by_vote) {
-    # train one model and forward-predict the testing genotypes
-    fit  <- do.call(locus_train, train_args)
-    pred <- locus_pred(fit, geno_mat, testing_genotypes)
-    # return the single-model result
+    # train + predict with the best model, falling back to the other on failure
+    fp <- .hc_forward_predict(train_args, geno_mat, testing_genotypes, model_selected, verbose)
+    # return the single-model result (prediction_model reflects the model used)
     return(list(method = "single model - single prediction",
                 cross_validation_results = fit_cv,
-                prediction_model = fit,
-                predictions = pred))
+                prediction_model = fp$fit,
+                predictions = fp$pred))
   }
 
   # ---- Step IIB: consensus by voting over many random models ----
-  # closure that trains one model and predicts the testing genotypes
+  # closure that trains+predicts one vote, falling back to the other model if
+  # the best model fails (e.g. KNN ties) for that random draw
   one_vote <- function() {
-    fit <- do.call(locus_train, train_args)
-    locus_pred(fit, geno_mat, testing_genotypes)
+    .hc_forward_predict(train_args, geno_mat, testing_genotypes, model_selected, verbose = FALSE)$pred
   }
 
   if (parallel) {

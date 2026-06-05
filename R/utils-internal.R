@@ -573,3 +573,50 @@
   # translate the human-readable model name to its short code
   if (best == "Random Forest") "rf" else "knn"
 }
+
+# ---- robust forward prediction ---------------------------------------------
+
+# Human-readable name for a model short code.
+.hc_model_name <- function(m) if (m == "knn") "k-nearest neighbors" else "random forest"
+
+# Train the chosen model and forward-predict, falling back to the other model
+# if the chosen one fails (e.g. KNN throws "too many ties in knn" at predict
+# time). Returns list(fit, pred, model_used). Errors only if BOTH models fail.
+.hc_forward_predict <- function(train_args, geno_mat, genotypes_to_predict, primary, verbose = TRUE) {
+
+  # the alternate model to fall back to when the primary one fails
+  alt <- if (primary == "knn") "rf" else "knn"
+
+  # train with one model and forward-predict; the caller wraps this in try()
+  attempt <- function(model) {
+    # reuse the training arguments but force the requested model
+    a <- train_args
+    a$models_request <- model
+    # train then predict the requested genotypes
+    fit <- do.call(locus_train, a)
+    pred <- locus_pred(fit, geno_mat, genotypes_to_predict)
+    # bundle the fit, predictions, and which model actually ran
+    list(fit = fit, pred = pred, model_used = model)
+  }
+
+  # try the CV-selected (primary) model first
+  res <- try(attempt(primary), silent = TRUE)
+  # success -> return immediately
+  if (!inherits(res, "try-error")) return(res)
+
+  # primary failed: warn (surfacing the underlying error) and try the alternate
+  warning(sprintf("Forward prediction with the %s model failed: %s. Falling back to the %s model.",
+                  .hc_model_name(primary),
+                  conditionMessage(attr(res, "condition")),
+                  .hc_model_name(alt)), call. = FALSE)
+  res <- try(attempt(alt), silent = TRUE)
+  # the fallback worked -> note it and return
+  if (!inherits(res, "try-error")) {
+    if (verbose) message("Forward prediction succeeded with the ", .hc_model_name(alt), " model.")
+    return(res)
+  }
+
+  # both models failed: stop with the underlying error message
+  stop(sprintf("Forward prediction failed for both the k-nearest neighbors and random forest models: %s. Check your data and parameters.",
+               conditionMessage(attr(res, "condition"))), call. = FALSE)
+}
