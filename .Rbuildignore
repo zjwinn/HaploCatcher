@@ -5,6 +5,8 @@
 ^HaploCatcher-source\.R$
 ^tools$
 ^cran-readiness-report\.md$
+^cran-comments\.md$
+^revdep$
 ^The Plant Genome.*\.pdf$
 ^\.Rhistory$
 ^\.gitignore$

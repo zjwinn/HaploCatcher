@@ -1,3 +1,20 @@
 .Rproj.user
 inst/doc
 LICENSE
+
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+
+# R CMD check / build artifacts
+*.Rcheck/
+*.tar.gz
+
+# revdepcheck heavy outputs (keep the small *.md summaries)
+revdep/library/
+revdep/checks/
+revdep/library.noindex/
+revdep/checks.noindex/
+revdep/data.sqlite
+revdep/*.html
