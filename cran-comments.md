@@ -1,3 +1,10 @@
+## Resubmission
+
+This is a resubmission. In response to the previous submission, I have fixed
+the (possibly) invalid file URI reported by CRAN: the README linked to NEWS.md
+with a relative file path. The README now links to an absolute, resolvable URL
+(the project's GitHub release notes) instead.
+
 ## Submission
 
 This is an update of HaploCatcher (version 2.0.1).
@@ -16,10 +23,8 @@ highlights:
 
 ## Test environments
 
-<!-- Fill these in once each check has completed. -->
 * local: Windows 11, R 4.6.0 -- 0 errors | 0 warnings | 0 notes
-* win-builder: R-devel and R-release -- (pending)
-* R-hub: (pending)
+* win-builder: R-devel and R-release -- 0 errors | 0 warnings | 0 notes
 
 ## R CMD check results
 

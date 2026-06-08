@@ -15,7 +15,7 @@ To install HaploCatcher in R, users can use the following function taken from th
 # Install HaploCatcher
 devtools::install_github("zjwinn/HaploCatcher")
 ```
-It is recommended to install using the above code to get the most up-to-date version of HaploCatcher. To install from [CRAN](https://cran.rstudio.com/) instead, use the following code in R:
+It is recommended to install using the above code to get the most up-to-date version of HaploCatcher. To install from [CRAN](https://CRAN.R-project.org/package=HaploCatcher) instead, use the following code in R:
 ```r
 # Install HaploCatcher from CRAN
 install.packages("HaploCatcher")
@@ -29,4 +29,4 @@ vignette("An_Intro_to_HaploCatcher")
 ```
 
 ## News
-See the [changelog](NEWS.md) for a full history of changes. The current release, **HaploCatcher 2.0.0**, is a major restructure for speed and maintainability that also adds user-definable case labels (`het_label` / `neg_label`) so you are no longer locked into the `gene` / `het_gene` / `non_gene` naming convention.
+See the [release notes](https://github.com/zjwinn/HaploCatcher/releases) for a full history of changes. The current release, **HaploCatcher 2.0.1**, is a major restructure for speed and maintainability that also adds user-definable case labels (`het_label` / `neg_label`) so you are no longer locked into the `gene` / `het_gene` / `non_gene` naming convention.
